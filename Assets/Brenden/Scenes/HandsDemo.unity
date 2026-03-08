@@ -165,33 +165,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
   handTrackingEvents: {fileID: 900514476}
-  handShapes:
-  - {fileID: 11400000, guid: cebf9d54452be2c469c20dd4a52ccdfd, type: 2}
-  - {fileID: 11400000, guid: 52d3febf454517b4bbccbd2d85979e39, type: 2}
-  - {fileID: 11400000, guid: 513f4e0155b3f4b43b0343866aa2109d, type: 2}
-  - {fileID: 11400000, guid: 341f1197bbfca68458e4b666bdfda6f5, type: 2}
-  - {fileID: 11400000, guid: b683326d64756224eac1341024093cfc, type: 2}
-  - {fileID: 11400000, guid: 1e91eeb51d34d8a48b9993f6867fc135, type: 2}
-  - {fileID: 11400000, guid: 504b28fbc5affed429a9d742476b5745, type: 2}
-  - {fileID: 11400000, guid: 7fc2ab4baf666ac419d49aa1e0ea5ece, type: 2}
-  - {fileID: 11400000, guid: 7e336df52ed460348bc6c15b5599313c, type: 2}
-  - {fileID: 11400000, guid: 3e2c4211f6bb5ae46bc94bacb9dc4c35, type: 2}
-  - {fileID: 11400000, guid: 20ad1ba22386d3e479fdf314b92a266a, type: 2}
-  - {fileID: 11400000, guid: 47cf006bdd008e84e86b20a7db66bfb4, type: 2}
-  - {fileID: 11400000, guid: c20e3fc1bf489d645856702494c5b550, type: 2}
-  - {fileID: 11400000, guid: 614569122317a10489b5931042077bea, type: 2}
-  - {fileID: 11400000, guid: b80af0ab53c06fb4e83dd4e887cc0927, type: 2}
-  - {fileID: 11400000, guid: cb72606cb3ffc68479c696a6baad65e5, type: 2}
-  - {fileID: 11400000, guid: fff089216b41fe74eb90e11223b45097, type: 2}
-  - {fileID: 11400000, guid: 5ef081849ab86c6419a55f1888c3878b, type: 2}
-  - {fileID: 11400000, guid: 045686acc4e5aa34184df8598e9ddabf, type: 2}
   gestureDetectionInterval: 0.1
   completenessCalculator: {fileID: 1022748376}
-  handPoseOverride: {fileID: 0}
-  targetHandShapeName: R
-  targetAnimatorPoseName: Sign_R
-  minimumThreshold: 0.9
-  releaseThreshold: 0.75
+  gestures: []
 --- !u!114 &900514476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,7 +427,6 @@ GameObject:
   - component: {fileID: 1287476726}
   - component: {fileID: 1287476727}
   - component: {fileID: 1287476728}
-  - component: {fileID: 1287476729}
   m_Layer: 0
   m_Name: DetectGesture_RightHand
   m_TagString: Untagged
@@ -516,58 +491,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
   handTrackingEvents: {fileID: 1287476727}
-  handShapes:
-  - {fileID: 11400000, guid: 7493ab22a81a8464cb59526692c85eca, type: 2}
-  - {fileID: 11400000, guid: cc2271ac68092e5449edff687c2497d3, type: 2}
-  - {fileID: 11400000, guid: 43af436fdb11460458d4d824d275cd26, type: 2}
-  - {fileID: 11400000, guid: 1081aff7d6584dc459c3fc20f492f72c, type: 2}
-  - {fileID: 11400000, guid: c6a01644fa1ce8443955261e4ed55580, type: 2}
-  - {fileID: 11400000, guid: 9e1cb2c6226b0a84f9e9a1fbe413f564, type: 2}
-  - {fileID: 11400000, guid: d247069fa43eebc4da0e181d512d53d1, type: 2}
-  - {fileID: 11400000, guid: c1e60bac5dbd28143a373a53577d3c01, type: 2}
-  - {fileID: 11400000, guid: 56a69ee78e14de04a84085209b4a1b65, type: 2}
-  - {fileID: 11400000, guid: b0a993e6c3e399543adc6057e91c95e5, type: 2}
-  - {fileID: 11400000, guid: fa90e588a5068334cac1560798aaaf70, type: 2}
-  - {fileID: 11400000, guid: 710b1ae61cd403d44b590186d5fc7bd7, type: 2}
-  - {fileID: 11400000, guid: f5b1d5f22221fbd48a8fa9bc45b46ced, type: 2}
-  - {fileID: 11400000, guid: 3a83d4daf75393345939d7502e063682, type: 2}
-  - {fileID: 11400000, guid: 1d4bec90bb5d59841ac433ed4b57e1be, type: 2}
-  - {fileID: 11400000, guid: b3fbcfce814e02948b7f36216772d56f, type: 2}
-  - {fileID: 11400000, guid: 6a396d0527a1096498698e8e47c9a782, type: 2}
-  - {fileID: 11400000, guid: 60e6b5eec271dfa4cad258b7a5723aaa, type: 2}
-  - {fileID: 11400000, guid: 3dbc6b277390bcd47847c51f7f472447, type: 2}
-  - {fileID: 11400000, guid: 20db2658e62587a4f80b5b9b2abc309c, type: 2}
   gestureDetectionInterval: 0.1
   completenessCalculator: {fileID: 1022748376}
-  handPoseOverride: {fileID: 4870440506592939028, guid: f792683b89b66d841b2295b4a19bf06e,
-    type: 3}
-  targetHandShapeName: R
-  targetAnimatorPoseName: Sign_R
-  minimumThreshold: 0.6
-  releaseThreshold: 0.4
---- !u!114 &1287476729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1287476725}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3c1f587ac2eb8e44b333df1b5603f88, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
-  handTrackingEvents: {fileID: 1287476727}
-  handShapes:
-  - {fileID: 11400000, guid: 3a83d4daf75393345939d7502e063682, type: 2}
-  gestureDetectionInterval: 0.1
-  completenessCalculator: {fileID: 1022748376}
-  handPoseOverride: {fileID: 4870440506592939028, guid: f792683b89b66d841b2295b4a19bf06e,
-    type: 3}
-  targetHandShapeName: R
-  targetAnimatorPoseName: Sign_R
-  minimumThreshold: 0.6
-  releaseThreshold: 0.4
+  gestures:
+  - handShape: {fileID: 11400000, guid: 3a83d4daf75393345939d7502e063682, type: 2}
+    animatorPoseName: Sign_R
+    activateThreshold: 0.65
+    releaseThreshold: 0.5
 --- !u!1 &1320577879
 GameObject:
   m_ObjectHideFlags: 0
@@ -906,7 +836,7 @@ MonoBehaviour:
   m_DrawMeshes: 1
   m_DebugDrawPrefab: {fileID: 6507399986997092475, guid: 254b742d65a15d14b9df756ae77de868,
     type: 3}
-  m_DebugDrawJoints: 1
+  m_DebugDrawJoints: 0
   m_VelocityPrefab: {fileID: 8538602047018081646, guid: 629fd7882ec6bfc499a5fcf20035282b,
     type: 3}
   m_VelocityType: 2

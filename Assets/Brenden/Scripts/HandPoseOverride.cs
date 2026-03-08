@@ -1,95 +1,140 @@
 using UnityEngine;
+using UnityEngine.XR.Hands;
 
+/// <summary>
+/// Single-prefab approach: swaps control between XRHandSkeletonDriver and Animator
+/// on the SAME hand mesh. No duplicate models needed.
+/// </summary>
 public class HandPoseOverride : MonoBehaviour
 {
-    [Header("Required References")]
-    [SerializeField] private Animator handAnimator; 
-    [SerializeField] private Behaviour liveTrackingScript; 
+    [Header("References (auto-found if left empty)")]
+    [Tooltip("The Animator on this hand prefab. Must have an AnimatorController with your pose Bool parameters.")]
+    [SerializeField] private Animator handAnimator;
 
-    private string activePoseParameter = ""; 
+    [Tooltip("The live tracking script (XRHandSkeletonDriver). Auto-found on Start if empty.")]
+    [SerializeField] private Behaviour liveTrackingScript;
+
+    private string activePoseParameter = "";
     private bool poseActive;
 
-    private void Reset()
+     // Static registry so DetectGesture can find the runtime clone
+    public static HandPoseOverride ActiveRightHand { get; private set; }
+
+    private void OnEnable()
     {
-        handAnimator = GetComponentInChildren<Animator>();
+        // When the XR system spawns the clone and enables it, register here
+        ActiveRightHand = this;
+        Debug.Log($"[HandPoseOverride] Registered on: {gameObject.name}");
+    }
+
+    
+
+    private void Start()
+    {
+        // Auto-find components on this hand prefab if not assigned
+        if (handAnimator == null)
+            handAnimator = GetComponentInChildren<Animator>();
+
+        if (liveTrackingScript == null)
+            liveTrackingScript = GetComponentInChildren<XRHandSkeletonDriver>();
+
+        // Validate
+        if (handAnimator == null)
+            Debug.LogError("[HandPoseOverride] No Animator found on this hand!", this);
+        else if (handAnimator.runtimeAnimatorController == null)
+            Debug.LogError("[HandPoseOverride] Animator has NO AnimatorController! Drag your controller asset onto the Animator component.", handAnimator);
+
+        if (liveTrackingScript == null)
+            Debug.LogWarning("[HandPoseOverride] No XRHandSkeletonDriver found on this hand.", this);
+
+        // Start in live tracking mode: driver ON, animator OFF
+        SetMode(live: true);
     }
 
     /// <summary>
-    /// Activation signal from gesture detector.
-    /// Example: ActivatePose("Sign_R"), ActivatePose("Sign_M")
+    /// Called by DetectGesture when a pose is recognized.
     /// </summary>
     public void ActivatePose(string poseName)
     {
-        if (string.IsNullOrWhiteSpace(poseName) || handAnimator == null || liveTrackingScript == null)
+        if (string.IsNullOrWhiteSpace(poseName))
             return;
 
+        if (handAnimator == null || handAnimator.runtimeAnimatorController == null)
+        {
+            Debug.LogError("[HandPoseOverride] Cannot activate — Animator or Controller missing!");
+            return;
+        }
+
+        // Already showing this exact pose, nothing to do
         if (poseActive && activePoseParameter == poseName)
             return;
 
-        // 1. Turn OFF the live tracking
-        liveTrackingScript.enabled = false;
-
-        // 2. Turn ON the Animator so it can take control
-        handAnimator.enabled = true; 
-
+        // If switching from a different pose, clear it first
         if (poseActive && !string.IsNullOrEmpty(activePoseParameter))
             handAnimator.SetBool(activePoseParameter, false);
 
-        handAnimator.SetBool(poseName, true);
+        // PAUSE live tracking, ENABLE animator
+        SetMode(live: false);
 
+        // Snap to requested pose
+        handAnimator.SetBool(poseName, true);
         activePoseParameter = poseName;
         poseActive = true;
+
+        Debug.Log($"[HandPoseOverride] Pose ON: {poseName}");
     }
 
+    /// <summary>
+    /// Called by DetectGesture when score drops below release threshold.
+    /// </summary>
     public void DeactivatePose()
     {
-        if (handAnimator == null || liveTrackingScript == null)
-            return;
-
         if (!poseActive)
             return;
 
-        if (!string.IsNullOrEmpty(activePoseParameter))
+        // Clear the animator pose
+        if (handAnimator != null && !string.IsNullOrEmpty(activePoseParameter))
+        {
             handAnimator.SetBool(activePoseParameter, false);
+            Debug.Log($"[HandPoseOverride] Pose OFF: {activePoseParameter}");
+        }
 
         activePoseParameter = "";
         poseActive = false;
 
-        // 1. Turn OFF the Animator so it releases the bones
-        handAnimator.enabled = false; 
-
-        // 2. Turn ON the live tracking
-        liveTrackingScript.enabled = true;
+        // DISABLE animator, RESUME live tracking
+        SetMode(live: true);
     }
+
     /// <summary>
-    /// Convenience API if detector emits true/false for a specific pose.
+    /// Swaps control between live tracking and Animator.
+    /// live=true  → skeleton driver ON,  animator OFF  (fingers follow real hand)
+    /// live=false → skeleton driver OFF, animator ON   (fingers follow animation clip)
     /// </summary>
-    public void TogglePose(string poseName, bool isActive)
+       private void SetMode(bool live)
     {
-        if (isActive) ActivatePose(poseName);
-        else DeactivatePose();
+        if (liveTrackingScript != null)
+            liveTrackingScript.enabled = live;
+
+        if (handAnimator != null)
+        {
+            handAnimator.enabled = !live;
+
+            // Force immediate initialization so SetBool works on the same frame
+            if (!live)
+                handAnimator.Rebind();
+        }
     }
 
-    private void OnDisable()
+        private void OnDisable()
     {
-        // Safety: never leave tracking disabled when this component turns off
         if (liveTrackingScript != null)
             liveTrackingScript.enabled = true;
-    }
+        if (handAnimator != null)
+            handAnimator.enabled = false;
 
-    private void Start()
-    {
-        // When the Hand Visualizer clones this hand into the game, 
-        // automatically search this clone for the live tracking script!
-        if (liveTrackingScript == null)
-        {
-            // This searches the current hand clone (and any of its children) for the XR Skeleton Driver
-            liveTrackingScript = GetComponentInChildren<UnityEngine.XR.Hands.XRHandSkeletonDriver>();
-            
-            if (liveTrackingScript == null)
-            {
-                Debug.LogWarning("HandPoseOverride: Could not find the XRHandSkeletonDriver on this hand clone!");
-            }
-        }
+        // Unregister
+        if (ActiveRightHand == this)
+            ActiveRightHand = null;
     }
 }
