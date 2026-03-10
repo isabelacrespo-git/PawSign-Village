@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4b862ee14fb479fbfe5fffe655d3ed3, type: 3}
   m_Name: MetaQuestTouchProControllerProfile Standalone
   m_EditorClassIdentifier: 
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta Quest Touch Pro Controller Profile
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metaquestpro
@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3aced3429e5911458f4da2dac9d0f29, type: 3}
   m_Name: MetaHandTrackingAim Android
   m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.OpenXR.MetaHandTrackingAim
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta Hand Tracking Aim
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metahandtrackingaim
@@ -540,7 +540,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3aced3429e5911458f4da2dac9d0f29, type: 3}
   m_Name: MetaHandTrackingAim Standalone
   m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.OpenXR.MetaHandTrackingAim
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta Hand Tracking Aim
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metahandtrackingaim
@@ -592,7 +592,7 @@ MonoBehaviour:
     m_List: 00000000
   m_depthSubmissionMode: 0
   m_spacewarpMotionVectorTextureFormat: 0
-  m_optimizeBufferDiscards: 0
+  m_optimizeBufferDiscards: 1
   m_symmetricProjection: 0
   m_optimizeMultiviewRenderRegions: 0
   m_multiviewRenderRegionsOptimizationMode: 0
@@ -628,7 +628,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b7365b139f7aec43b23d26b7a48b5a6, type: 3}
   m_Name: MetaQuestTouchPlusControllerProfile Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR::UnityEngine.XR.OpenXR.Features.Interactions.MetaQuestTouchPlusControllerProfile
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Meta Quest Touch Plus Controller Profile
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.metaquestplus
@@ -869,7 +869,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e314dfef9af0904e80129bcc0a79361, type: 3}
   m_Name: HandTracking Android
   m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.OpenXR.HandTracking
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Hand Tracking Subsystem
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.handtracking
@@ -1128,7 +1128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e314dfef9af0904e80129bcc0a79361, type: 3}
   m_Name: HandTracking Standalone
   m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.OpenXR.HandTracking
-  m_enabled: 0
+  m_enabled: 1
   nameUi: Hand Tracking Subsystem
   version: 0.0.1
   featureIdInternal: com.unity.openxr.feature.input.handtracking
