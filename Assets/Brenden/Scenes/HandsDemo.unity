@@ -166,6 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
   handTrackingEvents: {fileID: 900514476}
   gestureDetectionInterval: 0.1
+  smoothingFrames: 8
   completenessCalculator: {fileID: 1022748376}
   gestures: []
 --- !u!114 &900514476
@@ -427,6 +428,7 @@ GameObject:
   - component: {fileID: 1287476726}
   - component: {fileID: 1287476727}
   - component: {fileID: 1287476728}
+  - component: {fileID: 1287476729}
   m_Layer: 0
   m_Name: DetectGesture_RightHand
   m_TagString: Untagged
@@ -491,13 +493,57 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
   handTrackingEvents: {fileID: 1287476727}
-  gestureDetectionInterval: 0.1
+  gestureDetectionInterval: 0.05
+  smoothingFrames: 2
   completenessCalculator: {fileID: 1022748376}
   gestures:
   - handShape: {fileID: 11400000, guid: a51a3b4f99fd0f24fad4ffe62e729a4a, type: 2}
     animatorPoseName: Sign_M
     activateThreshold: 0.65
     releaseThreshold: 0.5
+  - handShape: {fileID: 11400000, guid: fe0df02931a6cde49bdcae44b8e7dbd0, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+  - handShape: {fileID: 11400000, guid: e6afbc264b66c684ea4b7f90b944d452, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+  - handShape: {fileID: 11400000, guid: a3eb84e3ab2820f4a9461921ebabbf07, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+--- !u!114 &1287476729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1287476725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f24e5b4c31d230548b9c49afd2c493d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DynamicGestureRecognizer
+  detectGesture: {fileID: 1287476728}
+  dynamicSigns:
+  - signName: Sign_J_Right
+    requiredHandShapes:
+    - {fileID: 11400000, guid: fe0df02931a6cde49bdcae44b8e7dbd0, type: 2}
+    - {fileID: 11400000, guid: e6afbc264b66c684ea4b7f90b944d452, type: 2}
+    - {fileID: 11400000, guid: a3eb84e3ab2820f4a9461921ebabbf07, type: 2}
+    requiredPoses: []
+    maxGapBetweenSteps: 2
+    minGapBetweenSteps: 0.01
+    minSequenceDuration: 0.08
+    maxSequenceDuration: 2.2
+    requireRearmBetweenRepeats: 1
+    rearmDelay: 0.1
+    cooldown: 0.15
+  minStaticPoseConfidence: 0.55
+  minTopScoreMargin: 0.002
+  minPoseHoldTime: 0.03
+  debugSequenceProgress: 1
 --- !u!1 &1320577879
 GameObject:
   m_ObjectHideFlags: 0
@@ -847,7 +893,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873398930}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe5c1542003740d4eb76fd8f983c699e, type: 3}
   m_Name: 
@@ -915,7 +961,7 @@ Transform:
   m_GameObject: {fileID: 1879080443}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.008, y: -0.022, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -7,6 +7,10 @@ using UnityEngine.XR.Hands.Samples.GestureSample;
 
 public class DetectGesture : MonoBehaviour
 {
+    public event Action<XRHandShape, string, float, float, bool> StaticGestureFrameEvaluated;
+    public event Action<string, float> StaticGestureActivated;
+    public event Action<string> StaticGestureReleased;
+
     [Serializable]
     public class GestureEntry
     {
@@ -18,6 +22,7 @@ public class DetectGesture : MonoBehaviour
 
     [SerializeField] private XRHandTrackingEvents handTrackingEvents;
     [SerializeField] private float gestureDetectionInterval = 0.1f;
+    [SerializeField] private int smoothingFrames = 8;
     [SerializeField] private HandShapeCompletenessCalculator completenessCalculator;
 
     [Header("Pose Override")]
@@ -31,6 +36,25 @@ public class DetectGesture : MonoBehaviour
     private float timeOfLastConditionCheck;
     private string activeGesture = "";
 
+    private static bool HasAnimatorPose(GestureEntry entry)
+    {
+        return entry != null && !string.IsNullOrWhiteSpace(entry.animatorPoseName);
+    }
+
+    private static string BuildGestureKey(GestureEntry entry, int index)
+    {
+        if (entry == null)
+            return $"Gesture_{index}";
+
+        if (!string.IsNullOrWhiteSpace(entry.animatorPoseName))
+            return entry.animatorPoseName;
+
+        if (entry.handShape != null && !string.IsNullOrWhiteSpace(entry.handShape.name))
+            return $"{entry.handShape.name}_{index}";
+
+        return $"Gesture_{index}";
+    }
+
     void OnEnable()
     {
         if (handTrackingEvents != null)
@@ -41,10 +65,12 @@ public class DetectGesture : MonoBehaviour
         entryLookup.Clear();
         if (gestures != null)
         {
-            foreach (var g in gestures)
+            for (int i = 0; i < gestures.Length; i++)
             {
-                smoothers[g.animatorPoseName] = new GestureSmoother(8);
-                entryLookup[g.animatorPoseName] = g;
+                var g = gestures[i];
+                var key = BuildGestureKey(g, i);
+                smoothers[key] = new GestureSmoother(Mathf.Max(1, smoothingFrames));
+                entryLookup[key] = g;
             }
         }
     }
@@ -66,8 +92,11 @@ public class DetectGesture : MonoBehaviour
         // Score every gesture
         Dictionary<string, float> scores = new Dictionary<string, float>();
 
-        foreach (var entry in gestures)
+        for (int i = 0; i < gestures.Length; i++)
         {
+            var entry = gestures[i];
+            var key = BuildGestureKey(entry, i);
+
             bool ok = completenessCalculator.TryCalculateHandShapeCompletenessScore(
                 eventArgs.hand,
                 entry.handShape,
@@ -75,13 +104,38 @@ public class DetectGesture : MonoBehaviour
 
             if (!ok) continue;
 
-            float smoothed = smoothers[entry.animatorPoseName].GetSmoothedScore(rawScore);
-            scores[entry.animatorPoseName] = smoothed;
+            float smoothed = smoothers[key].GetSmoothedScore(rawScore);
+            scores[key] = smoothed;
 
-            Debug.Log($"[DetectGesture] {entry.animatorPoseName}: raw={rawScore:F3}, smoothed={smoothed:F3}");
+            string debugName = !string.IsNullOrWhiteSpace(entry.animatorPoseName)
+                ? entry.animatorPoseName
+                : (entry.handShape != null ? entry.handShape.name : key);
+
+            Debug.Log($"[DetectGesture] {debugName}: raw={rawScore:F3}, smoothed={smoothed:F3}");
         }
 
         bool isTracked = handTrackingEvents.handIsTracked;
+
+        string topGestureName = "";
+        XRHandShape topGestureShape = null;
+        float topGestureScore = 0f;
+        float secondBestScore = 0f;
+        foreach (var kvp in scores)
+        {
+            if (kvp.Value > topGestureScore)
+            {
+                secondBestScore = topGestureScore;
+                topGestureName = kvp.Key;
+                topGestureShape = entryLookup[kvp.Key].handShape;
+                topGestureScore = kvp.Value;
+            }
+            else if (kvp.Value > secondBestScore)
+            {
+                secondBestScore = kvp.Value;
+            }
+        }
+        float topScoreMargin = topGestureScore - secondBestScore;
+        StaticGestureFrameEvaluated?.Invoke(topGestureShape, topGestureName, topGestureScore, topScoreMargin, isTracked);
 
         // --- Hysteresis logic ---
         // If a gesture is already active, keep it until its score drops below releaseThreshold
@@ -100,6 +154,7 @@ public class DetectGesture : MonoBehaviour
             // Score dropped below release threshold — deactivate
             Debug.Log($"[DetectGesture] Releasing {activeGesture}");
             handPoseOverride?.DeactivatePose();
+            StaticGestureReleased?.Invoke(activeGesture);
             activeGesture = "";
         }
 
@@ -110,6 +165,9 @@ public class DetectGesture : MonoBehaviour
         foreach (var kvp in scores)
         {
             GestureEntry entry = entryLookup[kvp.Key];
+            if (!HasAnimatorPose(entry))
+                continue;
+
             if (kvp.Value >= entry.activateThreshold && kvp.Value > bestScore)
             {
                 bestGesture = kvp.Key;
@@ -122,6 +180,7 @@ public class DetectGesture : MonoBehaviour
             Debug.Log($"[DetectGesture] >>> Activating {bestGesture} (score={bestScore:F3})");
             handPoseOverride?.ActivatePose(bestGesture);
             activeGesture = bestGesture;
+            StaticGestureActivated?.Invoke(bestGesture, bestScore);
         }
 
         if (!isTracked)
@@ -129,6 +188,7 @@ public class DetectGesture : MonoBehaviour
             if (!string.IsNullOrEmpty(activeGesture))
             {
                 handPoseOverride?.DeactivatePose();
+                StaticGestureReleased?.Invoke(activeGesture);
                 activeGesture = "";
             }
             foreach (var s in smoothers.Values)

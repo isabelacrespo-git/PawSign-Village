@@ -1,12 +1,8 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Samples/XR Hands/1.7.3/Hand Capture/Materials/EnvironmentMaterials/Grid/Grid Dark Large.mat.meta
 guid: 378826b6bab12464da099ae824723fd8
-========
-guid: 613690cd962241049a0ec289a6ff835e
->>>>>>>> main:Assets/Samples/XR Hands/1.7.3/HandVisualizer/Materials/HandsDefaultMaterial.mat.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 2100000
+  mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

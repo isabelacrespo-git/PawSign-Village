@@ -1,12 +1,8 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Samples/XR Hands/1.7.3/Hand Capture/Materials/EnvironmentMaterials/Black_No_Shadows.mat.meta
 guid: 82c19fd53a39841a7987ef595a936df0
-========
-guid: a9a13bc103911be4fa6c19c25b16b7b8
->>>>>>>> main:Assets/Plane Material.mat.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 2100000
+  mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
