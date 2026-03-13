@@ -20,6 +20,7 @@ public class Rupert : MonoBehaviour
     public TMP_Text nameText;
     public string[] dialogue;
     private int index = 0;
+    private Coroutine typingCoroutine;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -46,7 +47,7 @@ public class Rupert : MonoBehaviour
     }
 
     // Unsubscribe to when trigger is pressed
-    private void onDisable()
+    private void OnDisable()
     {
         leftTrigger.action.performed -= OnTriggerPressed;
         rightTrigger.action.performed -= OnTriggerPressed;
@@ -74,7 +75,7 @@ public class Rupert : MonoBehaviour
                     npcPanel.SetActive(true);
                     nameText.text = npcName;
                     dialogueText.text = "";
-                    StartCoroutine(Typing());
+                    typingCoroutine = StartCoroutine(Typing());
                     startedDialogue = true;
                 }
             }
@@ -93,6 +94,10 @@ public class Rupert : MonoBehaviour
     // Reset text
     public void ZeroText()
     {
+        if (typingCoroutine != null) {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
         dialogueText.text = "";
         nameText.text = "";
         index = 0;
@@ -105,7 +110,7 @@ public class Rupert : MonoBehaviour
         foreach (char letter in dialogue[index].ToCharArray())
         {
             dialogueText.text += letter;
-            yield return new WaitForSeconds(0.04f);
+            yield return new WaitForSeconds(0.03f);
         }
     }
 
@@ -118,7 +123,7 @@ public class Rupert : MonoBehaviour
             dialogueText.text = "";
             
             npcPanel.SetActive(true);
-            StartCoroutine(Typing());
+            typingCoroutine = StartCoroutine(Typing());
             
         }
         else
