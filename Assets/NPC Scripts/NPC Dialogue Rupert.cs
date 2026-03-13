@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-public class NPCDialogue : MonoBehaviour
+public class Rupert : MonoBehaviour
 {
     private bool playerDetection = false;
     private bool startedDialogue = false;
@@ -15,7 +15,6 @@ public class NPCDialogue : MonoBehaviour
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor rightRay;
     public GameObject npcPanel;
-    // TODO: implement aslPanel animations
     public string npcName;
     public TMP_Text dialogueText;
     public TMP_Text nameText;
@@ -23,20 +22,24 @@ public class NPCDialogue : MonoBehaviour
     private int index = 0;
     private Coroutine typingCoroutine;
 
-    private void OnTriggerEnter(Collider other) {
-        if (other.name == "Player") {
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Player")
+        {
             playerDetection = true;
         }
     }
 
-    private void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other)
+    {
         playerDetection = false;
         ZeroText();
         startedDialogue = false;
     }
 
     // Subscribe to when trigger is pressed
-    private void OnEnable() {
+    private void OnEnable()
+    {
         leftTrigger.action.performed += OnTriggerPressed;
         rightTrigger.action.performed += OnTriggerPressed;
         leftTrigger.action.Enable();
@@ -44,7 +47,8 @@ public class NPCDialogue : MonoBehaviour
     }
 
     // Unsubscribe to when trigger is pressed
-    private void OnDisable() {
+    private void OnDisable()
+    {
         leftTrigger.action.performed -= OnTriggerPressed;
         rightTrigger.action.performed -= OnTriggerPressed;
         leftTrigger.action.Disable();
@@ -52,17 +56,22 @@ public class NPCDialogue : MonoBehaviour
     }
 
     // When trigger is pressed
-    private void OnTriggerPressed(InputAction.CallbackContext context) {
-        if (!startedDialogue) {
+    private void OnTriggerPressed(InputAction.CallbackContext context)
+    {
+        if (!startedDialogue)
+        {
             RaycastHit hit;
             bool leftHit = leftRay.TryGetCurrent3DRaycastHit(out hit) && hit.collider.CompareTag("NPC");
             bool rightHit = rightRay.TryGetCurrent3DRaycastHit(out hit) && hit.collider.CompareTag("NPC");
             // When player is in range, controller is aimed at NPC, and trigger has been pressed
-            if (playerDetection && (leftHit || rightHit)) {
-                if (npcPanel.activeInHierarchy) {
+            if (playerDetection && (leftHit || rightHit))
+            {
+                if (npcPanel.activeInHierarchy)
+                {
                     ZeroText();
-                } 
-                else {
+                }
+                else
+                {
                     npcPanel.SetActive(true);
                     nameText.text = npcName;
                     dialogueText.text = "";
@@ -70,19 +79,21 @@ public class NPCDialogue : MonoBehaviour
                     startedDialogue = true;
                 }
             }
-        } else {
+        }
+        else
+        {
             // Text has finished typing
             // TODO: don't allow user to go to the next line until animation has finished
-            if (dialogueText.text == dialogue[index] || dialogue[index] == "DEMONSTRATION" || dialogue[index] == "SIGNING") {
+            if (dialogueText.text == dialogue[index])
+            {
                 NextLine();
             }
-
-            // TODO: Note handing at the end of the lesson
         }
     }
 
     // Reset text
-    public void ZeroText() {
+    public void ZeroText()
+    {
         if (typingCoroutine != null) {
             StopCoroutine(typingCoroutine);
             typingCoroutine = null;
@@ -90,35 +101,33 @@ public class NPCDialogue : MonoBehaviour
         dialogueText.text = "";
         nameText.text = "";
         index = 0;
-        npcPanel.SetActive(false); 
+        npcPanel.SetActive(false);
     }
 
     // Typing animation
-    IEnumerator Typing() {
-        foreach(char letter in dialogue[index].ToCharArray()) {
+    IEnumerator Typing()
+    {
+        foreach (char letter in dialogue[index].ToCharArray())
+        {
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
     }
 
     // Continue to next dialogue line
-    public void NextLine() {
-        if (index < dialogue.Length - 1) {
+    public void NextLine()
+    {
+        if (index < dialogue.Length - 1)
+        {
             index++;
             dialogueText.text = "";
-            if (dialogue[index] == "DEMONSTRATION") {
-                Debug.Log("Demonstration");
-                // TODO: show animation for signing
-            } else if (dialogue[index] == "SIGNING") {
-                npcPanel.SetActive(false); 
-                Debug.Log("Signing");
-                // TODO: prompt user to switch to hands (automatic or manual?)
-                // TODO: implement asl testing here
-            } else {
-                npcPanel.SetActive(true);
-                typingCoroutine = StartCoroutine(Typing());
-            }
-        } else {
+            
+            npcPanel.SetActive(true);
+            typingCoroutine = StartCoroutine(Typing());
+            
+        }
+        else
+        {
             ZeroText();
             startedDialogue = false;
         }
