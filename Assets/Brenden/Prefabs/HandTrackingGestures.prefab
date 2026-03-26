@@ -1,0 +1,254 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3674888270702846088
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2224463256072952057}
+  - component: {fileID: 9118647195961975926}
+  - component: {fileID: 781254865221957210}
+  - component: {fileID: 124194852822983066}
+  m_Layer: 0
+  m_Name: DetectGesture_RightHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2224463256072952057
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674888270702846088}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1606845787731102356}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9118647195961975926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674888270702846088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b9cf54c47f40ee9c3eb30ea8eb89b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.XRHandTrackingEvents
+  m_Handedness: 2
+  m_UpdateType: 1
+  m_PoseUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JointsUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingAcquired:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingLost:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &781254865221957210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674888270702846088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c1f587ac2eb8e44b333df1b5603f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
+  handTrackingEvents: {fileID: 9118647195961975926}
+  gestureDetectionInterval: 0.05
+  smoothingFrames: 2
+  completenessCalculator: {fileID: 7071229836497103762}
+  gestures:
+  - handShape: {fileID: 11400000, guid: a51a3b4f99fd0f24fad4ffe62e729a4a, type: 2}
+    animatorPoseName: Sign_M
+    activateThreshold: 0.65
+    releaseThreshold: 0.5
+  - handShape: {fileID: 11400000, guid: fe0df02931a6cde49bdcae44b8e7dbd0, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+  - handShape: {fileID: 11400000, guid: e6afbc264b66c684ea4b7f90b944d452, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+  - handShape: {fileID: 11400000, guid: a3eb84e3ab2820f4a9461921ebabbf07, type: 2}
+    animatorPoseName: 
+    activateThreshold: 0.68
+    releaseThreshold: 0.58
+--- !u!114 &124194852822983066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3674888270702846088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f24e5b4c31d230548b9c49afd2c493d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DynamicGestureRecognizer
+  detectGesture: {fileID: 781254865221957210}
+  dynamicSigns:
+  - signName: Sign_J_Right
+    requiredHandShapes:
+    - {fileID: 11400000, guid: fe0df02931a6cde49bdcae44b8e7dbd0, type: 2}
+    - {fileID: 11400000, guid: e6afbc264b66c684ea4b7f90b944d452, type: 2}
+    - {fileID: 11400000, guid: a3eb84e3ab2820f4a9461921ebabbf07, type: 2}
+    requiredPoses: []
+    maxGapBetweenSteps: 2
+    minGapBetweenSteps: 0.01
+    minSequenceDuration: 0.08
+    maxSequenceDuration: 2.2
+    requireRearmBetweenRepeats: 1
+    rearmDelay: 0.1
+    cooldown: 0.15
+  minStaticPoseConfidence: 0.55
+  minTopScoreMargin: 0.002
+  minPoseHoldTime: 0.03
+  debugSequenceProgress: 1
+--- !u!1 &3677933217602404251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1615063350797092393}
+  - component: {fileID: 7262597812855043358}
+  - component: {fileID: 409238821050762264}
+  m_Layer: 0
+  m_Name: DetectGesture_LeftHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1615063350797092393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3677933217602404251}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1606845787731102356}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7262597812855043358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3677933217602404251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5b9cf54c47f40ee9c3eb30ea8eb89b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Hands::UnityEngine.XR.Hands.XRHandTrackingEvents
+  m_Handedness: 1
+  m_UpdateType: 1
+  m_PoseUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JointsUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingAcquired:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingLost:
+    m_PersistentCalls:
+      m_Calls: []
+  m_TrackingChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &409238821050762264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3677933217602404251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c1f587ac2eb8e44b333df1b5603f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DetectGesture
+  handTrackingEvents: {fileID: 7262597812855043358}
+  gestureDetectionInterval: 0.1
+  smoothingFrames: 8
+  completenessCalculator: {fileID: 7071229836497103762}
+  gestures: []
+--- !u!1 &7539339251300121969
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1606845787731102356}
+  - component: {fileID: 7071229836497103762}
+  m_Layer: 0
+  m_Name: HandTrackingGestures
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1606845787731102356
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7539339251300121969}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2224463256072952057}
+  - {fileID: 1615063350797092393}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7071229836497103762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7539339251300121969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51bc5101a6c04184bd18310280d25439, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.XR.Hands.Samples.Gestures::UnityEngine.XR.Hands.Samples.GestureSample.HandShapeCompletenessCalculator
