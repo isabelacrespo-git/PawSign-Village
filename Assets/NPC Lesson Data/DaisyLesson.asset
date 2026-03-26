@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b132555fd1ca4194fa5f8ff95132b812, type: 3}
+  m_Name: DaisyLesson
+  m_EditorClassIdentifier: Assembly-CSharp::NPCLessonData
+  npcName: Daisy
+  dialogue:
+  - "Hi there, I\u2019m Daisy. It\u2019s so nice to meet you!"
+  - "Let\u2019s begin your ASL learning journey with the alphabet."
+  - Follow along while I sign the first 5 letters.
+  - DEMONSTRATION
+  - Now try it on your own.
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - "Yesss that was fantastic! Now let\u2019s move on to the next 5 letters."
+  - DEMONSTRATION
+  - "Now let\u2019s see what you remember."
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - Awesome job! Now let's do k through n.
+  - DEMONSTRATION
+  - Your turn!
+  - SIGNING
+  - SIGNING
+  - Fantastic! Onto the next letters.
+  - DEMONSTRATION
+  - Give it a go!
+  - SIGNING
+  - Wow impressive! Let's continue.
+  - DEMONSTRATION
+  - Show me what you know!
+  - SIGNING
+  - Amazing! Now for the last 4 letters.
+  - DEMONSTRATION
+  - Now try it yourself!
+  - SIGNING
+  - Wow you're a natural!
+  - "Before we finish, I don\u2019t think I caught your name yet! Try signing it
+    to me!"
+  - DEMONSTRATION
+  - Now try it out!
+  - SIGNING
+  - Yay! Congrats on finishing your first lesson!
+  - It was so nice to meet you! If you ever need a refresher on how to sign the alphabet
+    again, I have a little note for you with the alphabet drawn! Good luck with learning
+    ASL!
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  lessonSigns:
+  - A
+  - B
+  - C
+  - D
+  - E
+  - F
+  - G
+  - H
+  - I
+  - J
+  - K
+  - L
+  - M
+  - N
+  - O
+  - P
+  - Q
+  - R
+  - S
+  - T
+  - U
+  - V
+  - W
+  - X
+  - Y
+  - Z
+  successFormat: Good job! That was {0}.
