@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "XR Device Simulator Controls",
     "maps": [
         {
@@ -171,7 +172,7 @@
                     "name": "X Constraint",
                     "type": "Button",
                     "id": "11dc7a94-7230-49ff-b56d-06e6473e9951",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -207,7 +208,7 @@
                     "name": "Toggle Primary 2D Axis Target",
                     "type": "Button",
                     "id": "e0fdec2d-309b-4313-aad7-9dcc71f1394d",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -216,7 +217,7 @@
                     "name": "Toggle Secondary 2D Axis Target",
                     "type": "Button",
                     "id": "b3b49ea5-f80f-4d24-a782-d61a13a004b3",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -246,7 +247,7 @@
                 {
                     "name": "negative",
                     "id": "3d2e07de-025e-4c2e-98df-250511a8ff6d",
-                    "path": "<Keyboard>/a",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -257,7 +258,7 @@
                 {
                     "name": "positive",
                     "id": "04e1437d-c862-4a04-8f8e-40e9f52c4f5e",
-                    "path": "<Keyboard>/d",
+                    "path": "<Keyboard>/a",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
