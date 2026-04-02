@@ -43,6 +43,10 @@ public class NPCDialogue : MonoBehaviour
     private string currentExpectedSign = "";
     private Coroutine typingCoroutine;
     private Coroutine signSuccessCoroutine;
+    [Header("Failure Feedback if Player Signs Incorrect Sign")]
+    public string failureFormat = "That was close but not quite right, let's try signing {0} again!";
+    public float failureMessageDuration = 2.0f;
+    private bool processingFailure = false;
 
     private string ActiveNpcName => lessonData != null && !string.IsNullOrEmpty(lessonData.npcName)
         ? lessonData.npcName
@@ -92,6 +96,7 @@ public class NPCDialogue : MonoBehaviour
 
         if (signMatcher != null) {
             signMatcher.ExpectedSignMatched += OnExpectedSignMatched;
+            signMatcher.WrongSignDetected += onWrongSignDetected;
         }
     }
 
@@ -109,9 +114,38 @@ public class NPCDialogue : MonoBehaviour
 
         if (signMatcher != null) {
             signMatcher.ExpectedSignMatched -= OnExpectedSignMatched;
+            signMatcher.WrongSignDetected -= onWrongSignDetected;
         }
     }
 
+    //When the wrong side is detected
+    private void onWrongSignDetected(string detectedSign)
+    {
+        //do not interrupt if we are already showing a success or failure message
+        if (!waitingForExpectedSign || processingSignSuccess || processingFailure)
+        {
+            return;
+        }
+
+        StartCoroutine(ShowFailureAndRetry(detectedSign));
+    }
+
+    private IEnumerator ShowFailureAndRetry(string detectedSign)
+    {
+        processingFailure = true;
+
+        dialogueText.text = string.Format(failureFormat, currentExpectedSign);
+
+        yield return new WaitForSeconds(failureMessageDuration);
+
+        //resetting text so the user knows what to do
+        if (waitingForExpectedSign)
+        {
+            dialogueText.text = "Show me sign: " + currentExpectedSign;
+        }
+
+        processingFailure = false;
+    }
     // When trigger is pressed
     private void OnTriggerPressed(InputAction.CallbackContext context) {
         if (requiredAnchor != null && !requiredAnchor.IsPlayerOnAnchor) {

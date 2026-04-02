@@ -16,6 +16,7 @@ public class ExpectedSignMatcher : MonoBehaviour
     [SerializeField] private float requiredHoldDuration = 0.20f;
 
     public event Action<string> ExpectedSignMatched;
+    public event Action<string> WrongSignDetected;
 
     public bool IsWaitingForSign { get; private set; }
 
@@ -75,20 +76,25 @@ public class ExpectedSignMatcher : MonoBehaviour
         bool passesScore = topGestureScore >= minExpectedSignScore;
         bool passesMargin = topScoreMargin >= minExpectedScoreMargin;
 
-        if (!isExpected || !passesScore || !passesMargin)
+        //If the signed sign by the player is correct
+        if (isExpected && passesScore && passesMargin)
         {
-            expectedSignHoldTimer = 0f;
-            return;
+            expectedSignHoldTimer += Time.deltaTime;
+            if (expectedSignHoldTimer >= requiredHoldDuration)
+            {
+                string matched = expectedSign;
+                StopWaiting();
+                ExpectedSignMatched?.Invoke(matched);
+            }
         }
+        else if (!isExpected && passesScore && passesMargin && !string.IsNullOrEmpty(detected))
+        {
 
-        expectedSignHoldTimer += Time.deltaTime;
-        if (expectedSignHoldTimer < requiredHoldDuration)
-            return;
-
-        string matched = expectedSign;
-        StopWaiting();
-        ExpectedSignMatched?.Invoke(matched);
+            expectedSignHoldTimer = 0f;
+            WrongSignDetected?.Invoke(detected);
+        }
     }
+
 
     private static string NormalizeSignName(string signName)
     {
