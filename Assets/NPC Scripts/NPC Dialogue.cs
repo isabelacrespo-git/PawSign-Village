@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.Events;
+using Unity.VisualScripting;
 
 public class NPCDialogue : MonoBehaviour
 {
@@ -97,6 +98,7 @@ public class NPCDialogue : MonoBehaviour
         if (signMatcher != null) {
             signMatcher.ExpectedSignMatched += OnExpectedSignMatched;
             signMatcher.WrongSignDetected += onWrongSignDetected;
+            
         }
     }
 
@@ -134,14 +136,23 @@ public class NPCDialogue : MonoBehaviour
     {
         processingFailure = true;
 
-        dialogueText.text = string.Format(failureFormat, currentExpectedSign);
+        //if we recognize the wrong sign the player sign we mention it specifically
+        if (!string.IsNullOrEmpty(detectedSign))
+        {
+            dialogueText.text = $"You signed {detectedSign}, but I asked for {currentExpectedSign}. Give it another shot!.";
+        }
+        else
+        {
+            //if we dont recognize the incorrect sign, we still give a nonspecific retry message
+            dialogueText.text = string.Format(failureFormat, currentExpectedSign);
+        }
 
         yield return new WaitForSeconds(failureMessageDuration);
 
-        //resetting text so the user knows what to do
+        //after feedback message, remind the player what letter they must sign
         if (waitingForExpectedSign)
         {
-            dialogueText.text = "Show me sign: " + currentExpectedSign;
+            dialogueText.text = "Can you show me sign: " + currentExpectedSign;
         }
 
         processingFailure = false;
