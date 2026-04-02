@@ -36,6 +36,74 @@ public class DetectGesture : MonoBehaviour
     private float timeOfLastConditionCheck;
     private string activeGesture = "";
 
+    //cache all festure scores 
+    private readonly Dictionary<string, float> lastScores = new Dictionary<string, float>();
+
+    //looks through stored scores and finds which one best contributes to the current letter
+    public bool TryGetBestScoreForSign(string signName, out float bestScore)
+    {
+        bestScore = 0f;
+
+        //if nothing is passed or we have no stored gestures, we have nothing to search through
+        if (string.IsNullOrEmpty(signName) || lastScores.Count == 0)
+            return false;
+
+        //normalize signs the sign the caller asked for
+        string wanted = NormalizeSignKey(signName);
+        //tracks if we found a valid entry
+        bool found = false;
+
+        //lastScores contains gesture keys to keep their latest scores
+        foreach (var kvp in lastScores)
+        {
+            if (NormalizeSignKey(kvp.Key) == wanted)
+            {   
+                //if this is the first match or this match has a better score than the one we have saved
+                //we keep this higher score
+                if (!found || kvp.Value > bestScore)
+                    bestScore = kvp.Value;
+
+                found = true;
+            }
+        }
+
+        //if we return true, we one at least one score for the sign if false, no entries matched
+        return found;
+    }
+
+    private static string NormalizeSignKey(string signName)
+    {
+        if (string.IsNullOrEmpty(signName))
+            return "";
+
+        string normalized = signName.Trim().ToUpperInvariant();
+
+        int trailingUnderscore = normalized.LastIndexOf('_');
+        if (trailingUnderscore >= 0 && trailingUnderscore < normalized.Length - 1)
+        {
+            bool suffixIsDigits = true;
+            for (int i = trailingUnderscore + 1; i < normalized.Length; i++)
+            {
+                if (!char.IsDigit(normalized[i]))
+                {
+                    suffixIsDigits = false;
+                    break;
+                }
+            }
+
+            if (suffixIsDigits)
+                normalized = normalized.Substring(0, trailingUnderscore);
+        }
+
+        if (normalized.StartsWith("SIGN_"))
+            normalized = normalized.Substring(5);
+
+        int sideSeparator = normalized.IndexOf(" - ");
+        if (sideSeparator > 0)
+            normalized = normalized.Substring(0, sideSeparator);
+
+        return normalized.Trim();
+    }
     private static bool HasAnimatorPose(GestureEntry entry)
     {
         return entry != null && !string.IsNullOrWhiteSpace(entry.animatorPoseName);
@@ -114,6 +182,11 @@ public class DetectGesture : MonoBehaviour
             Debug.Log($"[DetectGesture] {debugName}: raw={rawScore:F3}, smoothed={smoothed:F3}");
         }
 
+        lastScores.Clear();
+        foreach (var kvp in scores)
+        {
+            lastScores[kvp.Key] = kvp.Value;
+        }
         bool isTracked = handTrackingEvents.handIsTracked;
 
         string topGestureName = "";

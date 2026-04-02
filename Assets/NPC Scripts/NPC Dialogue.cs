@@ -136,23 +136,20 @@ public class NPCDialogue : MonoBehaviour
     {
         processingFailure = true;
 
-        //if we recognize the wrong sign the player sign we mention it specifically
         if (!string.IsNullOrEmpty(detectedSign))
         {
-            dialogueText.text = $"You signed {detectedSign}, but I asked for {currentExpectedSign}. Give it another shot!.";
+            dialogueText.text = $"Nice try! But you signed {detectedSign}, instead of {currentExpectedSign}. Try again!";
         }
         else
         {
-            //if we dont recognize the incorrect sign, we still give a nonspecific retry message
             dialogueText.text = string.Format(failureFormat, currentExpectedSign);
         }
 
         yield return new WaitForSeconds(failureMessageDuration);
 
-        //after feedback message, remind the player what letter they must sign
         if (waitingForExpectedSign)
         {
-            dialogueText.text = "Can you show me sign: " + currentExpectedSign;
+            dialogueText.text = "Show me sign: " + currentExpectedSign;
         }
 
         processingFailure = false;
