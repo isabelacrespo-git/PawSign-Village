@@ -34,8 +34,8 @@ public class NPCDialogue : MonoBehaviour
     [Tooltip("Shown after a correct sign before moving to the next dialogue line.")]
     public string successFormat = "Good job! That was {0}.";
     public float successMessageDuration = 1.2f;
-    [Header("Success Effects")]
-    public ParticleSystem successConfetti;
+    [Tooltip("Invoked when the expected sign is matched successfully.")]
+    public UnityEvent onSignSuccess;
     private int index = 0;
     private int lessonSignIndex = 0;
     private bool waitingForExpectedSign = false;
@@ -225,11 +225,7 @@ public class NPCDialogue : MonoBehaviour
     private IEnumerator ShowSignSuccessAndContinue(string expectedSign) {
         npcPanel.SetActive(true);
         dialogueText.text = string.Format(ActiveSuccessFormat, expectedSign);
-
-        if (successConfetti != null) {
-            successConfetti.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-            successConfetti.Play();
-        }
+        onSignSuccess?.Invoke();
 
         yield return new WaitForSeconds(Mathf.Max(0f, successMessageDuration));
         processingSignSuccess = false;
