@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b132555fd1ca4194fa5f8ff95132b812, type: 3}
+  m_Name: RupertDialogue
+  m_EditorClassIdentifier: Assembly-CSharp::NPCLessonData
+  npcName: Rupert
+  dialogue:
+  - Hello there, welcome to PawSign Village! We are so excited to have you here!
+  - "I\u2019m Rupert, and I\u2019ll be your guide for getting settled into your new
+    home."
+  - Chat with our friendly villagers, to build your ASL skills, level up, and unlock
+    new ways to personalize your world.
+  - Head over to Daisy to begin your first lesson!
+  - Good luck with your ASL journey!
+  lessonSigns: []
+  successFormat: Good job! That was {0}.
