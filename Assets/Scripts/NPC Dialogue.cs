@@ -16,6 +16,7 @@ public class NPCDialogue : MonoBehaviour
     public InputActionReference rightTrigger;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor rightRay;
+    public GameObject inventoryItem;
     public GameObject npcPanel;
     // TODO: implement aslPanel animations
     [Header("Lesson Data")]
@@ -43,6 +44,7 @@ public class NPCDialogue : MonoBehaviour
     private string currentExpectedSign = "";
     private Coroutine typingCoroutine;
     private Coroutine signSuccessCoroutine;
+    private bool playerHasItem = false;
 
     private string ActiveNpcName => lessonData != null && !string.IsNullOrEmpty(lessonData.npcName)
         ? lessonData.npcName
@@ -156,8 +158,6 @@ public class NPCDialogue : MonoBehaviour
             if (dialogueText.text == activeDialogue[index] || activeDialogue[index] == "DEMONSTRATION" || activeDialogue[index] == "SIGNING") {
                 NextLine();
             }
-
-            // TODO: Note handing at the end of the lesson
         }
     }
 
@@ -269,6 +269,12 @@ public class NPCDialogue : MonoBehaviour
                 }
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
+                // If last line of dialogue
+                if (index == activeDialogue.Length - 1 && !playerHasItem) {
+                    inventoryItem.SetActive(true);
+                    // Won't give player item in future Daisy interactions
+                    playerHasItem = true;
+                }
             }
         } else {
             ZeroText();
