@@ -12,6 +12,7 @@ public class NPCDialogue : MonoBehaviour
     private bool playerDetection = false;
     private bool startedDialogue = false;
     public AnchorGate requiredAnchor;
+    public AudioManager audioManager;
     public InputActionReference leftTrigger;
     public InputActionReference rightTrigger;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
@@ -140,6 +141,7 @@ public class NPCDialogue : MonoBehaviour
                     nameText.text = ActiveNpcName;
                     dialogueText.text = "";
                     typingCoroutine = StartCoroutine(Typing());
+                    audioManager.StartTypingSound();
                     startedDialogue = true;
                 }
             }
@@ -220,6 +222,7 @@ public class NPCDialogue : MonoBehaviour
             StopCoroutine(signSuccessCoroutine);
         }
         signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign));
+        audioManager.PlaySFXOnce(audioManager.confetti);
     }
 
     private IEnumerator ShowSignSuccessAndContinue(string expectedSign) {
@@ -244,6 +247,7 @@ public class NPCDialogue : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
+        audioManager.StopTypingSound();
     }
 
     // Continue to next dialogue line
@@ -269,10 +273,12 @@ public class NPCDialogue : MonoBehaviour
                 }
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
+                audioManager.StartTypingSound();
                 // If last line of dialogue
                 if (index == activeDialogue.Length - 1 && !playerHasItem) {
                     inventoryItem.SetActive(true);
-                    // Won't give player item in future Daisy interactions
+                    audioManager.PlaySFXOnce(audioManager.reward);
+                    // Won't give player item in future interactions
                     playerHasItem = true;
                 }
             }
