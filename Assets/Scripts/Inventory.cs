@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class Inventory : MonoBehaviour
 {
     public Transform camera;
-    private float distance = 20f;
+    private float distance = 15f;
     public InputActionReference primaryButton;
     public GameObject inventoryUI;
 

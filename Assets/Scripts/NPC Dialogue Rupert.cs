@@ -10,6 +10,7 @@ public class Rupert : MonoBehaviour
 {
     private bool playerDetection = false;
     private bool startedDialogue = false;
+    public AudioManager audioManager;
     public InputActionReference leftTrigger;
     public InputActionReference rightTrigger;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
@@ -76,6 +77,7 @@ public class Rupert : MonoBehaviour
                     nameText.text = npcName;
                     dialogueText.text = "";
                     typingCoroutine = StartCoroutine(Typing());
+                    audioManager.StartTypingSound();
                     startedDialogue = true;
                 }
             }
@@ -112,6 +114,7 @@ public class Rupert : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
+        audioManager.StopTypingSound();
     }
 
     // Continue to next dialogue line
@@ -124,6 +127,7 @@ public class Rupert : MonoBehaviour
             
             npcPanel.SetActive(true);
             typingCoroutine = StartCoroutine(Typing());
+            audioManager.StartTypingSound();
             
         }
         else
