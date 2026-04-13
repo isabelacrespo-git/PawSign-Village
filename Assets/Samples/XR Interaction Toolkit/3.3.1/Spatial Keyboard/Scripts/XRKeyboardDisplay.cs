@@ -246,7 +246,12 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.SpatialKeyboard
         {
             // Set active keyboard to global keyboard if needed
             if (m_ActiveKeyboard == null || !m_UseSceneKeyboard)
-                m_ActiveKeyboard = GlobalNonNativeKeyboard.instance.keyboard;
+            {
+                if (GlobalNonNativeKeyboard.instance != null)
+                    m_ActiveKeyboard = GlobalNonNativeKeyboard.instance.keyboard;
+                else
+                    Debug.LogWarning("XRKeyboardDisplay could not find GlobalNonNativeKeyboard instance. Enable Use Scene Keyboard and assign a scene XRKeyboard, or add XRI Global Keyboard Manager to the scene.", this);
+            }
 
             // Observe keyboard if always observe is true
             var observeOnStart = m_AlwaysObserveKeyboard && m_ActiveKeyboard != null & !m_IsActivelyObservingKeyboard;
@@ -306,7 +311,10 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.SpatialKeyboard
             if (m_IsActivelyObservingKeyboard && !alwaysObserveKeyboard)
             {
                 if (!m_UseSceneKeyboard || m_Keyboard == null)
-                    GlobalNonNativeKeyboard.instance.RepositionKeyboardIfOutOfView();
+                {
+                    if (GlobalNonNativeKeyboard.instance != null)
+                        GlobalNonNativeKeyboard.instance.RepositionKeyboardIfOutOfView();
+                }
 
                 // Sync input field caret position with keyboard caret position
                 if (m_InputField.stringPosition != m_ActiveKeyboard.caretPosition)
@@ -321,7 +329,15 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.SpatialKeyboard
             // If not using a scene keyboard, use global keyboard.
             if (!m_UseSceneKeyboard || m_Keyboard == null)
             {
-                GlobalNonNativeKeyboard.instance.ShowKeyboard(m_InputField, m_MonitorInputFieldCharacterLimit);
+                if (GlobalNonNativeKeyboard.instance != null)
+                {
+                    GlobalNonNativeKeyboard.instance.ShowKeyboard(m_InputField, m_MonitorInputFieldCharacterLimit);
+                }
+                else
+                {
+                    Debug.LogWarning("XRKeyboardDisplay cannot open global keyboard because GlobalNonNativeKeyboard instance is missing.", this);
+                    return;
+                }
             }
             else
             {
