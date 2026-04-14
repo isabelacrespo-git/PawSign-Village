@@ -1,15 +1,13 @@
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+public class AudioManagerMain : MonoBehaviour
 {
-    public static AudioManager Instance { get; private set; }
+    public static AudioManagerMain Instance { get; private set; }
 
-    [SerializeField] AudioSource musicSource;
     [SerializeField] AudioSource typingSource;
     [SerializeField] AudioSource walkingSource;
     [SerializeField] AudioSource oneTimeSource;
     public AudioClip confetti;
-    public AudioClip grab;
     public AudioClip reward;
     public AudioClip UIClick;
 
@@ -23,20 +21,14 @@ public class AudioManager : MonoBehaviour
         EnsureAudioSources();
     }
 
-    private void Start() {
-        if (musicSource != null && musicSource.clip != null && !musicSource.isPlaying) {
-            musicSource.Play();
-        }
-    }
-
-    public static AudioManager GetOrCreate() {
-        AudioManager manager = FindFirstObjectByType<AudioManager>();
+    public static AudioManagerMain GetOrCreate() {
+        AudioManagerMain manager = FindFirstObjectByType<AudioManagerMain>();
         if (manager != null) {
             return manager;
         }
 
         GameObject go = new GameObject("Audio Manager");
-        manager = go.AddComponent<AudioManager>();
+        manager = go.AddComponent<AudioManagerMain>();
         return manager;
     }
 
@@ -71,10 +63,6 @@ public class AudioManager : MonoBehaviour
     }
 
     private void EnsureAudioSources() {
-        if (musicSource == null) {
-            musicSource = CreateChildAudioSource("Music", true, true, 0.5f);
-        }
-
         if (typingSource == null) {
             typingSource = CreateChildAudioSource("Typing SFX", true, false, 0.5f);
         }

@@ -5,10 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/Create-with-VR-Starter-Scene.unity
+  - enabled: 1
+    path: Assets/Brenden/Scenes/Start Menu.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/Brenden/Scenes/Main.unity
+    guid: 991775058e9e50f42b1cfc886289e0e9
+  - enabled: 0
     path: Assets/Samples/XR Hands/1.7.3/Hand Capture/HandCapture.unity
     guid: 1ebe1fe45ff8e46c9ac6fdd6bfd9ec73
   m_configObjects:
