@@ -92,12 +92,8 @@ public class NPCDialogue : MonoBehaviour
 
     private void OnEnable()
     {
-        // Subscribe to Video Manager events
-        if (videoManager != null)
-        {
-            //when video finishes playing start detecting expected sign
-            videoManager.OnVideoPlaybackComplete += StartSignDetectionAfterVideo;
-        }
+      
+     
 
         if (leftTrigger != null && leftTrigger.action != null)
         {
@@ -119,11 +115,7 @@ public class NPCDialogue : MonoBehaviour
 
     private void OnDisable()
     {
-        // Unsubscribe from Video Manager events
-        if (videoManager != null)
-        {
-            videoManager.OnVideoPlaybackComplete -= StartSignDetectionAfterVideo;
-        }
+   
 
         if (leftTrigger != null && leftTrigger.action != null)
         {
@@ -226,7 +218,7 @@ public class NPCDialogue : MonoBehaviour
         npcPanel.SetActive(false);
     }
 
-    private void BeginSignStep()
+    private void BeginSigningStep()
     {
         string[] activeLessonSigns = ActiveLessonSigns;
         if (activeLessonSigns == null || lessonSignIndex >= activeLessonSigns.Length)
@@ -237,30 +229,11 @@ public class NPCDialogue : MonoBehaviour
             return;
         }
 
-        // get current expected sign
         currentExpectedSign = activeLessonSigns[lessonSignIndex];
+        waitingForExpectedSign = true;
 
         npcPanel.SetActive(true);
-        dialogueText.text = $"A video will play showing how to sign letter {currentExpectedSign}.";
-
-        if (videoManager != null)
-        {
-            //ask video manager to show tutorial video for this sign
-            //the npc panel is also passed so it can be hidden during video playback
-
-            videoManager.ShowTutorial(currentExpectedSign, npcPanel);
-        }
-        else
-        {
-            // fallback if video manager is missing
-            StartSignDetectionAfterVideo();
-        }
-    }
-
-    // This method is triggered by the VideoManager's OnVideoPlaybackComplete event
-    private void StartSignDetectionAfterVideo()
-    {
-        waitingForExpectedSign = true;
+        dialogueText.text = "Now, show me: " + currentExpectedSign;
 
         if (autoSwitchToHandsForSigning)
         {
@@ -272,8 +245,10 @@ public class NPCDialogue : MonoBehaviour
             signMatcher.BeginWaitingForSign(currentExpectedSign);
         }
 
-        // The npcPanel is automatically re-enabled by videoManager.HideTutorial()
-        dialogueText.text = $"Alright! It's your turn now, give it a go! Sign {currentExpectedSign}";
+        if (videoManager != null)
+        {
+            videoManager.ShowTutorial(currentExpectedSign, npcPanel);
+        }
     }
 
     private void OnExpectedSignMatched(string matchedSign)
@@ -283,19 +258,26 @@ public class NPCDialogue : MonoBehaviour
             return;
         }
 
+        waitingForExpectedSign = false;
+        processingSignSuccess = true;
+
+        if (signMatcher != null)
+        {
+            signMatcher.StopWaiting();
+        }
+
         if (videoManager != null)
         {
             videoManager.HideTutorial();
         }
 
-        waitingForExpectedSign = false;
-        processingSignSuccess = true;
         lessonSignIndex++;
 
         if (signSuccessCoroutine != null)
         {
             StopCoroutine(signSuccessCoroutine);
         }
+
         signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign));
     }
 
@@ -306,9 +288,25 @@ public class NPCDialogue : MonoBehaviour
         onSignSuccess?.Invoke();
 
         yield return new WaitForSeconds(Mathf.Max(0f, successMessageDuration));
+
         processingSignSuccess = false;
         signSuccessCoroutine = null;
-        NextLine();
+
+        string[] activeLessonSigns = ActiveLessonSigns;
+
+        if (activeLessonSigns != null && lessonSignIndex < activeLessonSigns.Length)
+        {
+            BeginSigningStep();
+        }
+        else
+        {
+            if (autoSwitchToHandsForSigning)
+            {
+                onExitSigningMode?.Invoke();
+            }
+
+            NextLine();
+        }
     }
 
     IEnumerator Typing()
@@ -328,6 +326,7 @@ public class NPCDialogue : MonoBehaviour
 
     public void NextLine()
     {
+
         string[] activeDialogue = ActiveDialogue;
         if (activeDialogue == null || activeDialogue.Length == 0)
         {
@@ -338,24 +337,22 @@ public class NPCDialogue : MonoBehaviour
         {
             index++;
             dialogueText.text = "";
-            if (activeDialogue[index] == "DEMONSTRATION")
+
+            if (activeDialogue[index] == "SIGNING")
             {
-                BeginSignStep();
-                Debug.Log("Demonstration");
-            }
-            else if (activeDialogue[index] == "SIGNING")
-            {
-                StartSignDetectionAfterVideo();
+                BeginSigningStep();
                 Debug.Log("Signing");
             }
             else
             {
-                if (autoSwitchToHandsForSigning && waitingForExpectedSign == false && processingSignSuccess == false)
+                if (autoSwitchToHandsForSigning && !waitingForExpectedSign && !processingSignSuccess)
                 {
                     onExitSigningMode?.Invoke();
                 }
+
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
+
                 if (index == activeDialogue.Length - 1 && !playerHasItem)
                 {
                     inventoryItem.SetActive(true);
@@ -368,5 +365,6 @@ public class NPCDialogue : MonoBehaviour
             ZeroText();
             startedDialogue = false;
         }
+        }
     }
-}
+

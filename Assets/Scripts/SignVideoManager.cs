@@ -63,22 +63,16 @@ public class SignVideoManager : MonoBehaviour
 
         currentActiveNpcPanel = activeNpcPanel;
 
-        //hide current npc panel when video is playing
-        if (currentActiveNpcPanel != null)
-            currentActiveNpcPanel.SetActive(false);
-
         //show video panel
         if (videoPanel != null)
             videoPanel.SetActive(true);
 
         videoPlayer.Stop();
         videoPlayer.clip = mapping.clip;
-        videoPlayer.isLooping = false;
+        videoPlayer.isLooping = true;
 
         //ensuring event calls are removed to avoid duplicate calls
         videoPlayer.prepareCompleted -= OnPrepared;
-        videoPlayer.loopPointReached -= OnVideoFinished;
-
         videoPlayer.prepareCompleted += OnPrepared;
         videoPlayer.Prepare();
     }
@@ -86,9 +80,6 @@ public class SignVideoManager : MonoBehaviour
     private void OnPrepared(VideoPlayer vp)
     {
         vp.prepareCompleted -= OnPrepared;
-        vp.loopPointReached -= OnVideoFinished;
-        //called when video ends
-        vp.loopPointReached += OnVideoFinished;
         vp.Play();
     }
 
@@ -114,10 +105,6 @@ public class SignVideoManager : MonoBehaviour
         if (videoPanel != null)
             videoPanel.SetActive(false);
 
-        if (currentActiveNpcPanel != null)
-        {
-            currentActiveNpcPanel.SetActive(true);
-            currentActiveNpcPanel = null;
+        currentActiveNpcPanel = null;
         }
     }
-}
