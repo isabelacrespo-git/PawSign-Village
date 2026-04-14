@@ -16,48 +16,34 @@ MonoBehaviour:
   dialogue:
   - "Hi there, I\u2019m Daisy. It\u2019s so nice to meet you!"
   - "Let\u2019s begin your ASL learning journey with the alphabet."
-  - Follow along while I sign the first 5 letters.
-  - DEMONSTRATION
-  - Now try it on your own.
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - "Yesss that was fantastic! Now let\u2019s move on to the next 5 letters."
-  - DEMONSTRATION
-  - "Now let\u2019s see what you remember."
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - Awesome job! Now let's do k through n.
-  - DEMONSTRATION
-  - Your turn!
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - Fantastic! Onto the next letters.
-  - DEMONSTRATION
-  - Give it a go!
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - SIGNING
-  - Wow impressive! Let's continue.
-  - DEMONSTRATION
-  - Show me what you know!
+  - I'm going to show you a set of videos and would like you to replicate each hand
+    sign accordingly!
   - SIGNING
   - SIGNING
   - SIGNING
   - SIGNING
   - SIGNING
   - SIGNING
-  - Wow you're a natural!
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
+  - SIGNING
   - "Before we finish, I don\u2019t think I caught your name yet!"
   - Type your name on the keyboard for me.
   - NAME_INPUT
