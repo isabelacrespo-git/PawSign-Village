@@ -16,7 +16,8 @@ MonoBehaviour:
   dialogue:
   - "Hi there, I\u2019m Daisy. It\u2019s so nice to meet you!"
   - "Let\u2019s begin your ASL learning journey with the alphabet."
-  - Follow along while I sign the first 5 letters.
+  - First, I'm going to show a video and after you will have to replicate the sign
+    in the video
   - DEMONSTRATION
   - Now try it on your own.
   - SIGNING
