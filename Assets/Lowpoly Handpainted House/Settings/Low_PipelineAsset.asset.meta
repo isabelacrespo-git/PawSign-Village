@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f515b0994ee0428498d554c8e6b6ed35
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 286891
+  packageName: Lowpoly Handpainted House
+  packageVersion: 1.0
+  assetPath: Assets/Lowpoly Handpainted House/Settings/Low_PipelineAsset.asset
+  uploadId: 672499
