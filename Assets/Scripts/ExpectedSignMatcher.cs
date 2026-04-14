@@ -12,12 +12,17 @@ public class ExpectedSignMatcher : MonoBehaviour
     [SerializeField] private float minExpectedSignScore = 0.72f;
     [Tooltip("Expected sign must beat the second-best score by at least this margin.")]
     [SerializeField] private float minExpectedScoreMargin = 0.08f;
+    [Tooltip("If true, margin check is skipped when the expected sign is already the top detected sign.")]
+    [SerializeField] private bool ignoreMarginWhenExpectedIsTop = true;
+    [Tooltip("If true, margin check is skipped when the expected sign is currently the active override gesture.")]
+    [SerializeField] private bool ignoreMarginWhenExpectedIsActiveOverride = true;
     [Tooltip("How long the expected sign must be held before it is accepted.")]
     [SerializeField] private float requiredHoldDuration = 0.20f;
 
     public event Action<string> ExpectedSignMatched;
 
     public bool IsWaitingForSign { get; private set; }
+    public string CurrentExpectedSign => expectedSign;
 
     private string expectedSign = "";
     private float expectedSignHoldTimer = 0f;
@@ -70,10 +75,23 @@ public class ExpectedSignMatcher : MonoBehaviour
             return;
         }
 
-        string detected = NormalizeSignName(topGestureName);
-        bool isExpected = detected == expectedSign;
-        bool passesScore = topGestureScore >= minExpectedSignScore;
-        bool passesMargin = topScoreMargin >= minExpectedScoreMargin;
+        string detectedFromGestureKey = NormalizeSignName(topGestureName);
+        string detectedFromShapeName = topGestureShape != null ? NormalizeSignName(topGestureShape.name) : "";
+        string activeOverrideSign = detectGesture != null ? detectGesture.CurrentActiveGestureSign : "";
+        float activeOverrideScore = detectGesture != null ? detectGesture.CurrentActiveGestureScore : 0f;
+
+        bool expectedIsTop = detectedFromGestureKey == expectedSign || detectedFromShapeName == expectedSign;
+        bool expectedIsActiveOverride = activeOverrideSign == expectedSign;
+        bool isExpected = expectedIsTop || expectedIsActiveOverride;
+
+        float scoreForValidation = expectedIsTop
+            ? topGestureScore
+            : (expectedIsActiveOverride ? activeOverrideScore : topGestureScore);
+
+        bool passesScore = scoreForValidation >= minExpectedSignScore;
+        bool passesMargin = topScoreMargin >= minExpectedScoreMargin
+            || (ignoreMarginWhenExpectedIsTop && expectedIsTop)
+            || (ignoreMarginWhenExpectedIsActiveOverride && expectedIsActiveOverride);
 
         if (!isExpected || !passesScore || !passesMargin)
         {
@@ -117,6 +135,16 @@ public class ExpectedSignMatcher : MonoBehaviour
 
         if (normalized.StartsWith("SIGN_"))
             normalized = normalized.Substring(5);
+
+        if (normalized.EndsWith("_POSE"))
+            normalized = normalized.Substring(0, normalized.Length - 5);
+        else if (normalized.EndsWith("POSE") && normalized.Length > 4)
+            normalized = normalized.Substring(0, normalized.Length - 4);
+
+        if (normalized.EndsWith("_RIGHT"))
+            normalized = normalized.Substring(0, normalized.Length - 6);
+        else if (normalized.EndsWith("_LEFT"))
+            normalized = normalized.Substring(0, normalized.Length - 5);
 
         // Support hand-shape labels like "A - RIGHT" or "B - LEFT".
         int sideSeparator = normalized.IndexOf(" - ");
