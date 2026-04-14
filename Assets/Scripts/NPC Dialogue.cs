@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,13 +17,14 @@ public class NPCDialogue : MonoBehaviour
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor rightRay;
     public GameObject inventoryItem;
     public GameObject npcPanel;
-    // TODO: implement aslPanel animations
+
     [Header("Lesson Data")]
     public NPCLessonData lessonData;
     public string npcName;
     public TMP_Text dialogueText;
     public TMP_Text nameText;
     public string[] dialogue;
+
     [Header("Sign Lesson")]
     public ExpectedSignMatcher signMatcher;
     public string[] lessonSigns = { "A", "B", "C", "D", "E" };
@@ -37,6 +37,7 @@ public class NPCDialogue : MonoBehaviour
     public float successMessageDuration = 1.2f;
     [Tooltip("Invoked when the expected sign is matched successfully.")]
     public UnityEvent onSignSuccess;
+
     private int index = 0;
     private int lessonSignIndex = 0;
     private bool waitingForExpectedSign = false;
@@ -45,6 +46,10 @@ public class NPCDialogue : MonoBehaviour
     private Coroutine typingCoroutine;
     private Coroutine signSuccessCoroutine;
     private bool playerHasItem = false;
+
+    //reference to video manager
+    [Header("Video Settings")]
+    public SignVideoManager videoManager;
 
     private string ActiveNpcName => lessonData != null && !string.IsNullOrEmpty(lessonData.npcName)
         ? lessonData.npcName
@@ -62,65 +67,91 @@ public class NPCDialogue : MonoBehaviour
         ? lessonData.successFormat
         : successFormat;
 
-    private void Awake() {
-        if (signMatcher == null) {
+    private void Awake()
+    {
+        if (signMatcher == null)
+        {
             signMatcher = FindFirstObjectByType<ExpectedSignMatcher>();
         }
     }
 
-    private void OnTriggerEnter(Collider other) {
-        if (other.name == "Player") {
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "Player")
+        {
             playerDetection = true;
         }
     }
 
-    private void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other)
+    {
         playerDetection = false;
         ZeroText();
         startedDialogue = false;
     }
 
-    // Subscribe to when trigger is pressed
-    private void OnEnable() {
-        if (leftTrigger != null && leftTrigger.action != null) {
+    private void OnEnable()
+    {
+        // Subscribe to Video Manager events
+        if (videoManager != null)
+        {
+            //when video finishes playing start detecting expected sign
+            videoManager.OnVideoPlaybackComplete += StartSignDetectionAfterVideo;
+        }
+
+        if (leftTrigger != null && leftTrigger.action != null)
+        {
             leftTrigger.action.performed += OnTriggerPressed;
             leftTrigger.action.Enable();
         }
 
-        if (rightTrigger != null && rightTrigger.action != null) {
+        if (rightTrigger != null && rightTrigger.action != null)
+        {
             rightTrigger.action.performed += OnTriggerPressed;
             rightTrigger.action.Enable();
         }
 
-        if (signMatcher != null) {
+        if (signMatcher != null)
+        {
             signMatcher.ExpectedSignMatched += OnExpectedSignMatched;
         }
     }
 
-    // Unsubscribe to when trigger is pressed
-    private void OnDisable() {
-        if (leftTrigger != null && leftTrigger.action != null) {
+    private void OnDisable()
+    {
+        // Unsubscribe from Video Manager events
+        if (videoManager != null)
+        {
+            videoManager.OnVideoPlaybackComplete -= StartSignDetectionAfterVideo;
+        }
+
+        if (leftTrigger != null && leftTrigger.action != null)
+        {
             leftTrigger.action.performed -= OnTriggerPressed;
             leftTrigger.action.Disable();
         }
 
-        if (rightTrigger != null && rightTrigger.action != null) {
+        if (rightTrigger != null && rightTrigger.action != null)
+        {
             rightTrigger.action.performed -= OnTriggerPressed;
             rightTrigger.action.Disable();
         }
 
-        if (signMatcher != null) {
+        if (signMatcher != null)
+        {
             signMatcher.ExpectedSignMatched -= OnExpectedSignMatched;
         }
     }
 
-    // When trigger is pressed
-    private void OnTriggerPressed(InputAction.CallbackContext context) {
-        if (requiredAnchor != null && !requiredAnchor.IsPlayerOnAnchor) {
+    private void OnTriggerPressed(InputAction.CallbackContext context)
+    {
+        if (requiredAnchor != null && !requiredAnchor.IsPlayerOnAnchor)
+        {
             return;
         }
 
-        if (!startedDialogue) {
+        if (!startedDialogue)
+        {
             RaycastHit hit;
             bool leftHit = leftRay != null
                 && leftRay.TryGetCurrent3DRaycastHit(out hit)
@@ -130,12 +161,15 @@ public class NPCDialogue : MonoBehaviour
                 && rightRay.TryGetCurrent3DRaycastHit(out hit)
                 && hit.collider != null
                 && hit.collider.CompareTag("NPC");
-            // When player is in range, controller is aimed at NPC, and trigger has been pressed
-            if (playerDetection && (leftHit || rightHit)) {
-                if (npcPanel.activeInHierarchy) {
+
+            if (playerDetection && (leftHit || rightHit))
+            {
+                if (npcPanel.activeInHierarchy)
+                {
                     ZeroText();
-                } 
-                else {
+                }
+                else
+                {
                     npcPanel.SetActive(true);
                     nameText.text = ActiveNpcName;
                     dialogueText.text = "";
@@ -143,32 +177,37 @@ public class NPCDialogue : MonoBehaviour
                     startedDialogue = true;
                 }
             }
-        } else {
-            // Text has finished typing
-            // TODO: don't allow user to go to the next line until animation has finished
+        }
+        else
+        {
             string[] activeDialogue = ActiveDialogue;
-            if (activeDialogue == null || activeDialogue.Length == 0 || index >= activeDialogue.Length) {
+            if (activeDialogue == null || activeDialogue.Length == 0 || index >= activeDialogue.Length)
+            {
                 return;
             }
 
-            if (activeDialogue[index] == "SIGNING" && waitingForExpectedSign) {
+            if (activeDialogue[index] == "SIGNING" && waitingForExpectedSign)
+            {
                 return;
             }
 
-            if (dialogueText.text == activeDialogue[index] || activeDialogue[index] == "DEMONSTRATION" || activeDialogue[index] == "SIGNING") {
+            if (dialogueText.text == activeDialogue[index] || activeDialogue[index] == "DEMONSTRATION" || activeDialogue[index] == "SIGNING")
+            {
                 NextLine();
             }
         }
     }
 
-    // Reset text
-    public void ZeroText() {
-        if (typingCoroutine != null) {
+    public void ZeroText()
+    {
+        if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
             typingCoroutine = null;
         }
 
-        if (signSuccessCoroutine != null) {
+        if (signSuccessCoroutine != null)
+        {
             StopCoroutine(signSuccessCoroutine);
             signSuccessCoroutine = null;
         }
@@ -180,49 +219,88 @@ public class NPCDialogue : MonoBehaviour
         waitingForExpectedSign = false;
         processingSignSuccess = false;
         currentExpectedSign = "";
-        if (signMatcher != null) {
+        if (signMatcher != null)
+        {
             signMatcher.StopWaiting();
         }
-        npcPanel.SetActive(false); 
+        npcPanel.SetActive(false);
     }
 
-    private void BeginSignStep() {
+    private void BeginSignStep()
+    {
         string[] activeLessonSigns = ActiveLessonSigns;
-        if (activeLessonSigns == null || lessonSignIndex >= activeLessonSigns.Length) {
+        if (activeLessonSigns == null || lessonSignIndex >= activeLessonSigns.Length)
+        {
             waitingForExpectedSign = false;
             currentExpectedSign = "";
             NextLine();
             return;
         }
 
-        if (autoSwitchToHandsForSigning) {
+        // get current expected sign
+        currentExpectedSign = activeLessonSigns[lessonSignIndex];
+
+        npcPanel.SetActive(true);
+        dialogueText.text = $"A video will play showing how to sign letter {currentExpectedSign}.";
+
+        if (videoManager != null)
+        {
+            //ask video manager to show tutorial video for this sign
+            //the npc panel is also passed so it can be hidden during video playback
+
+            videoManager.ShowTutorial(currentExpectedSign, npcPanel);
+        }
+        else
+        {
+            // fallback if video manager is missing
+            StartSignDetectionAfterVideo();
+        }
+    }
+
+    // This method is triggered by the VideoManager's OnVideoPlaybackComplete event
+    private void StartSignDetectionAfterVideo()
+    {
+        waitingForExpectedSign = true;
+
+        if (autoSwitchToHandsForSigning)
+        {
             onEnterSigningMode?.Invoke();
         }
 
-        waitingForExpectedSign = true;
-        currentExpectedSign = activeLessonSigns[lessonSignIndex];
-        if (signMatcher != null) {
+        if (signMatcher != null)
+        {
             signMatcher.BeginWaitingForSign(currentExpectedSign);
         }
-        npcPanel.SetActive(true);
-        dialogueText.text = "Show me sign: " + currentExpectedSign;
+
+        // The npcPanel is automatically re-enabled by videoManager.HideTutorial()
+        dialogueText.text = $"Alright! It's your turn now, give it a go! Sign {currentExpectedSign}";
     }
-    private void OnExpectedSignMatched(string matchedSign) {
-        if (!startedDialogue || !waitingForExpectedSign || processingSignSuccess) {
+
+    private void OnExpectedSignMatched(string matchedSign)
+    {
+        if (!startedDialogue || !waitingForExpectedSign || processingSignSuccess)
+        {
             return;
+        }
+
+        if (videoManager != null)
+        {
+            videoManager.HideTutorial();
         }
 
         waitingForExpectedSign = false;
         processingSignSuccess = true;
         lessonSignIndex++;
 
-        if (signSuccessCoroutine != null) {
+        if (signSuccessCoroutine != null)
+        {
             StopCoroutine(signSuccessCoroutine);
         }
         signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign));
     }
 
-    private IEnumerator ShowSignSuccessAndContinue(string expectedSign) {
+    private IEnumerator ShowSignSuccessAndContinue(string expectedSign)
+    {
         npcPanel.SetActive(true);
         dialogueText.text = string.Format(ActiveSuccessFormat, expectedSign);
         onSignSuccess?.Invoke();
@@ -233,50 +311,60 @@ public class NPCDialogue : MonoBehaviour
         NextLine();
     }
 
-    // Typing animation
-    IEnumerator Typing() {
+    IEnumerator Typing()
+    {
         string[] activeDialogue = ActiveDialogue;
-        if (activeDialogue == null || activeDialogue.Length == 0 || index >= activeDialogue.Length) {
+        if (activeDialogue == null || activeDialogue.Length == 0 || index >= activeDialogue.Length)
+        {
             yield break;
         }
 
-        foreach(char letter in activeDialogue[index].ToCharArray()) {
+        foreach (char letter in activeDialogue[index].ToCharArray())
+        {
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
     }
 
-    // Continue to next dialogue line
-    public void NextLine() {
+    public void NextLine()
+    {
         string[] activeDialogue = ActiveDialogue;
-        if (activeDialogue == null || activeDialogue.Length == 0) {
+        if (activeDialogue == null || activeDialogue.Length == 0)
+        {
             return;
         }
 
-        if (index < activeDialogue.Length - 1) {
+        if (index < activeDialogue.Length - 1)
+        {
             index++;
             dialogueText.text = "";
-            if (activeDialogue[index] == "DEMONSTRATION") {
-                Debug.Log("Demonstration");
-                // TODO: show animation for signing
-            } else if (activeDialogue[index] == "SIGNING") {
+            if (activeDialogue[index] == "DEMONSTRATION")
+            {
                 BeginSignStep();
+                Debug.Log("Demonstration");
+            }
+            else if (activeDialogue[index] == "SIGNING")
+            {
+                StartSignDetectionAfterVideo();
                 Debug.Log("Signing");
-                // TODO: implement asl testing here
-            } else {
-                if (autoSwitchToHandsForSigning && waitingForExpectedSign == false && processingSignSuccess == false) {
+            }
+            else
+            {
+                if (autoSwitchToHandsForSigning && waitingForExpectedSign == false && processingSignSuccess == false)
+                {
                     onExitSigningMode?.Invoke();
                 }
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
-                // If last line of dialogue
-                if (index == activeDialogue.Length - 1 && !playerHasItem) {
+                if (index == activeDialogue.Length - 1 && !playerHasItem)
+                {
                     inventoryItem.SetActive(true);
-                    // Won't give player item in future Daisy interactions
                     playerHasItem = true;
                 }
             }
-        } else {
+        }
+        else
+        {
             ZeroText();
             startedDialogue = false;
         }
