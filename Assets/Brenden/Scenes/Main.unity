@@ -51983,7 +51983,7 @@ MonoBehaviour:
     clip: {fileID: 32900000, guid: ef4bc030357d89b478b19f13a86a0b69, type: 3}
   - signName: Y
     clip: {fileID: 32900000, guid: 77a2b7671c610844daf4b3e909fd8715, type: 3}
-  - signName: X
+  - signName: Z
     clip: {fileID: 32900000, guid: d0daac47dabbb134dbb7cee308f9bed3, type: 3}
 --- !u!1001 &1220002034
 PrefabInstance:
