@@ -124,6 +124,15 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
+    private void Update() {
+        // If player goes off of the teleport anchor
+        if (requiredAnchor && !requiredAnchor.IsPlayerOnAnchor && startedDialogue) {
+            playerDetection = false;
+            ZeroText();
+            startedDialogue = false;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.name == "Player")
@@ -201,7 +210,7 @@ public class NPCDialogue : MonoBehaviour
     // When trigger is pressed
     private void OnTriggerPressed(InputAction.CallbackContext context)
     {
-        if (requiredAnchor != null && !requiredAnchor.IsPlayerOnAnchor)
+        if (requiredAnchor && !requiredAnchor.IsPlayerOnAnchor)
         {
             return;
         }
@@ -281,6 +290,7 @@ public class NPCDialogue : MonoBehaviour
         {
             StopCoroutine(typingCoroutine);
             typingCoroutine = null;
+            audioManager?.StopTypingSound();
         }
 
         if (signSuccessCoroutine != null)
