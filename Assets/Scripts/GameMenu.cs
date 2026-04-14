@@ -8,13 +8,16 @@ public class GameMenu : MonoBehaviour
     [Header("UI Pages")]
     public GameObject mainMenu;
     public GameObject options;
+    public GameObject controls;
 
     [Header("Main Menu Buttons")]
     public Button startButton;
     public Button startMenuButton;
     public Button optionButton;
+    public Button controlsButton;
     public Button quitButton;
-    public Button backButton;
+    public Button backButton1;
+    public Button backButton2;
 
     // Start is called before the first frame update
     void Start()
@@ -31,8 +34,10 @@ public class GameMenu : MonoBehaviour
             startMenuButton.onClick.AddListener(StartMenu);
         }
         optionButton.onClick.AddListener(EnableOption);
+        controlsButton.onClick.AddListener(EnableControl);
         quitButton.onClick.AddListener(QuitGame);
-        backButton.onClick.AddListener(EnableMainMenu);
+        backButton1.onClick.AddListener(EnableMainMenu);
+        backButton2.onClick.AddListener(EnableMainMenu);
     }
 
     public void QuitGame()
@@ -67,6 +72,7 @@ public class GameMenu : MonoBehaviour
     {
         mainMenu.SetActive(true);
         options.SetActive(false);
+        controls.SetActive(false);
     }
     public void EnableOption()
     {
@@ -77,5 +83,11 @@ public class GameMenu : MonoBehaviour
     {
         mainMenu.SetActive(false);
         options.SetActive(false);
+    }
+
+    public void EnableControl() 
+    {
+        mainMenu.SetActive(false);
+        controls.SetActive(true);
     }
 }
