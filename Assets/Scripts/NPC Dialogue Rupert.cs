@@ -10,7 +10,7 @@ public class Rupert : MonoBehaviour
 {
     private bool playerDetection = false;
     private bool startedDialogue = false;
-    public AudioManager audioManager;
+    public AudioManagerMain audioManager;
     public InputActionReference leftTrigger;
     public InputActionReference rightTrigger;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
