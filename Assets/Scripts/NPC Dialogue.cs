@@ -89,6 +89,14 @@ public class NPCDialogue : MonoBehaviour
         : successFormat;
 
     private void Awake() {
+        if (audioManager == null) {
+            audioManager = FindFirstObjectByType<AudioManager>();
+        }
+
+        if (audioManager == null) {
+            audioManager = AudioManager.GetOrCreate();
+        }
+
         if (signMatcher == null) {
             signMatcher = FindFirstObjectByType<ExpectedSignMatcher>();
         }
@@ -180,7 +188,7 @@ public class NPCDialogue : MonoBehaviour
                     nameText.text = ActiveNpcName;
                     dialogueText.text = "";
                     typingCoroutine = StartCoroutine(Typing());
-                    audioManager.StartTypingSound();
+                    audioManager?.StartTypingSound();
                     startedDialogue = true;
                 }
             }
@@ -464,7 +472,9 @@ public class NPCDialogue : MonoBehaviour
             StopCoroutine(signSuccessCoroutine);
         }
         signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign, continueNameSigning));
-        audioManager.PlaySFXOnce(audioManager.confetti);
+        if (audioManager != null && audioManager.confetti != null) {
+            audioManager.PlaySFXOnce(audioManager.confetti);
+        }
     }
 
     private IEnumerator ShowSignSuccessAndContinue(string expectedSign, bool continueNameSigning) {
@@ -494,7 +504,7 @@ public class NPCDialogue : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
-        audioManager.StopTypingSound();
+        audioManager?.StopTypingSound();
     }
 
     // Continue to next dialogue line
@@ -524,11 +534,13 @@ public class NPCDialogue : MonoBehaviour
                 }
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
-                audioManager.StartTypingSound();
+                audioManager?.StartTypingSound();
                 // If last line of dialogue
                 if (index == activeDialogue.Length - 1 && !playerHasItem) {
                     inventoryItem.SetActive(true);
-                    audioManager.PlaySFXOnce(audioManager.reward);
+                    if (audioManager != null && audioManager.reward != null) {
+                        audioManager.PlaySFXOnce(audioManager.reward);
+                    }
                     // Won't give player item in future interactions
                     playerHasItem = true;
                 }
