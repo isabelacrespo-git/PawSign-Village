@@ -4,8 +4,10 @@ using UnityEngine.UI;
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using UnityEngine.Events;
+using UnityEngine.XR.Interaction.Toolkit.Samples.SpatialKeyboard;
 
 public class NPCDialogue : MonoBehaviour
 {
@@ -38,11 +40,34 @@ public class NPCDialogue : MonoBehaviour
     public float successMessageDuration = 1.2f;
     [Tooltip("Invoked when the expected sign is matched successfully.")]
     public UnityEvent onSignSuccess;
+    [Header("Name Input + Signing")]
+    [Tooltip("Dialogue marker that starts XR keyboard name input.")]
+    public string nameInputMarker = "NAME_INPUT";
+    [Tooltip("Dialogue marker that signs each letter from typed name.")]
+    public string nameSigningMarker = "NAME_SIGNING";
+    public TMP_InputField nameInputField;
+    public Button nameSubmitButton;
+    public GameObject nameInputPanel;
+    [Tooltip("Assigned world-space XRKeyboard to use near this NPC.")]
+    public XRKeyboard worldSpaceKeyboard;
+    [Tooltip("If true, uses world-space keyboard first, then falls back to global keyboard.")]
+    public bool preferWorldSpaceKeyboard = true;
+    [Tooltip("If true, pressing Enter/Submit on the XR keyboard submits the typed name.")]
+    public bool autoSubmitOnKeyboardEnter = true;
+    public string nameInputPrompt = "Before we finish, type your name on the keyboard, then press submit.";
+    public string nameSignInstructionFormat = "Great! Now sign each letter of your name: {0}";
+    public string nameLetterPromptFormat = "Show me letter: {0} ({1}/{2})";
     private int index = 0;
     private int lessonSignIndex = 0;
+    private int nameSignIndex = 0;
     private bool waitingForExpectedSign = false;
     private bool processingSignSuccess = false;
+    private bool waitingForNameInput = false;
+    private bool inNameSigningMode = false;
     private string currentExpectedSign = "";
+    private string typedName = "";
+    private readonly List<string> nameSigns = new List<string>();
+    private XRKeyboard activeNameKeyboard;
     private Coroutine typingCoroutine;
     private Coroutine signSuccessCoroutine;
     private bool playerHasItem = false;
@@ -64,8 +89,20 @@ public class NPCDialogue : MonoBehaviour
         : successFormat;
 
     private void Awake() {
+        if (audioManager == null) {
+            audioManager = FindFirstObjectByType<AudioManager>();
+        }
+
+        if (audioManager == null) {
+            audioManager = AudioManager.GetOrCreate();
+        }
+
         if (signMatcher == null) {
             signMatcher = FindFirstObjectByType<ExpectedSignMatcher>();
+        }
+
+        if (nameInputPanel == null && nameInputField != null) {
+            nameInputPanel = nameInputField.gameObject;
         }
     }
 
@@ -96,6 +133,10 @@ public class NPCDialogue : MonoBehaviour
         if (signMatcher != null) {
             signMatcher.ExpectedSignMatched += OnExpectedSignMatched;
         }
+
+        if (nameSubmitButton != null) {
+            nameSubmitButton.onClick.AddListener(SubmitTypedName);
+        }
     }
 
     // Unsubscribe to when trigger is pressed
@@ -113,6 +154,12 @@ public class NPCDialogue : MonoBehaviour
         if (signMatcher != null) {
             signMatcher.ExpectedSignMatched -= OnExpectedSignMatched;
         }
+
+        if (nameSubmitButton != null) {
+            nameSubmitButton.onClick.RemoveListener(SubmitTypedName);
+        }
+
+        DetachKeyboardSubmitListener();
     }
 
     // When trigger is pressed
@@ -141,7 +188,7 @@ public class NPCDialogue : MonoBehaviour
                     nameText.text = ActiveNpcName;
                     dialogueText.text = "";
                     typingCoroutine = StartCoroutine(Typing());
-                    audioManager.StartTypingSound();
+                    audioManager?.StartTypingSound();
                     startedDialogue = true;
                 }
             }
@@ -153,11 +200,25 @@ public class NPCDialogue : MonoBehaviour
                 return;
             }
 
+            // While a sign is expected (or success feedback is being shown),
+            // trigger input should not manually advance dialogue.
+            if (waitingForExpectedSign || processingSignSuccess) {
+                return;
+            }
+
+            if (waitingForNameInput) {
+                return;
+            }
+
             if (activeDialogue[index] == "SIGNING" && waitingForExpectedSign) {
                 return;
             }
 
-            if (dialogueText.text == activeDialogue[index] || activeDialogue[index] == "DEMONSTRATION" || activeDialogue[index] == "SIGNING") {
+            if (dialogueText.text == activeDialogue[index]
+                || activeDialogue[index] == "DEMONSTRATION"
+                || activeDialogue[index] == "SIGNING"
+                || activeDialogue[index] == nameInputMarker
+                || activeDialogue[index] == nameSigningMarker) {
                 NextLine();
             }
         }
@@ -179,12 +240,24 @@ public class NPCDialogue : MonoBehaviour
         nameText.text = "";
         index = 0;
         lessonSignIndex = 0;
+        nameSignIndex = 0;
         waitingForExpectedSign = false;
         processingSignSuccess = false;
+        waitingForNameInput = false;
+        inNameSigningMode = false;
         currentExpectedSign = "";
+        typedName = "";
+        nameSigns.Clear();
         if (signMatcher != null) {
             signMatcher.StopWaiting();
         }
+        if (nameInputField != null) {
+            nameInputField.text = "";
+        }
+        if (nameInputPanel != null) {
+            nameInputPanel.SetActive(false);
+        }
+        HideNameKeyboard();
         npcPanel.SetActive(false); 
     }
 
@@ -209,6 +282,177 @@ public class NPCDialogue : MonoBehaviour
         npcPanel.SetActive(true);
         dialogueText.text = "Show me sign: " + currentExpectedSign;
     }
+
+    private void BeginNameInputStep() {
+        waitingForNameInput = true;
+        inNameSigningMode = false;
+        waitingForExpectedSign = false;
+        processingSignSuccess = false;
+        currentExpectedSign = "";
+        typedName = "";
+        nameSigns.Clear();
+        nameSignIndex = 0;
+
+        if (signMatcher != null) {
+            signMatcher.StopWaiting();
+        }
+
+        if (autoSwitchToHandsForSigning) {
+            onExitSigningMode?.Invoke();
+        }
+
+        npcPanel.SetActive(true);
+        dialogueText.text = nameInputPrompt;
+
+        if (nameInputPanel != null) {
+            nameInputPanel.SetActive(true);
+        }
+
+        if (nameInputField != null) {
+            nameInputField.text = "";
+            ShowNameKeyboard();
+        }
+    }
+
+    private void BeginNameSigningStep() {
+        if (nameSigns.Count == 0) {
+            BeginNameInputStep();
+            return;
+        }
+
+        inNameSigningMode = true;
+        waitingForNameInput = false;
+
+        if (nameSignIndex >= nameSigns.Count) {
+            inNameSigningMode = false;
+            NextLine();
+            return;
+        }
+
+        if (autoSwitchToHandsForSigning) {
+            onEnterSigningMode?.Invoke();
+        }
+
+        waitingForExpectedSign = true;
+        currentExpectedSign = nameSigns[nameSignIndex];
+        if (signMatcher != null) {
+            signMatcher.BeginWaitingForSign(currentExpectedSign);
+        }
+
+        npcPanel.SetActive(true);
+        dialogueText.text = string.Format(nameLetterPromptFormat, currentExpectedSign, nameSignIndex + 1, nameSigns.Count);
+    }
+
+    public void SubmitTypedName() {
+        if (!waitingForNameInput) {
+            return;
+        }
+
+        string sourceText = nameInputField != null ? nameInputField.text : "";
+        string normalizedName = NormalizeNameToLetters(sourceText);
+        if (string.IsNullOrEmpty(normalizedName)) {
+            dialogueText.text = "Please type at least one letter for your name.";
+            return;
+        }
+
+        typedName = normalizedName;
+        nameSigns.Clear();
+        for (int i = 0; i < typedName.Length; i++) {
+            nameSigns.Add(typedName[i].ToString());
+        }
+        nameSignIndex = 0;
+        waitingForNameInput = false;
+
+        if (nameInputPanel != null) {
+            nameInputPanel.SetActive(false);
+        }
+        HideNameKeyboard();
+
+        npcPanel.SetActive(true);
+        dialogueText.text = string.Format(nameSignInstructionFormat, typedName);
+        NextLine();
+    }
+
+    private string NormalizeNameToLetters(string rawText) {
+        if (string.IsNullOrEmpty(rawText)) {
+            return "";
+        }
+
+        StringBuilder cleaned = new StringBuilder(rawText.Length);
+        for (int i = 0; i < rawText.Length; i++) {
+            char c = rawText[i];
+            if (char.IsLetter(c)) {
+                cleaned.Append(char.ToUpperInvariant(c));
+            }
+        }
+
+        return cleaned.ToString();
+    }
+
+    private void ShowNameKeyboard() {
+        if (nameInputField == null) {
+            return;
+        }
+
+        XRKeyboard keyboardToAttach = null;
+        bool openedWorldSpace = false;
+        if (preferWorldSpaceKeyboard && worldSpaceKeyboard != null) {
+            worldSpaceKeyboard.Open(nameInputField, true);
+            openedWorldSpace = true;
+            keyboardToAttach = worldSpaceKeyboard;
+        }
+
+        if (!openedWorldSpace && GlobalNonNativeKeyboard.instance != null) {
+            GlobalNonNativeKeyboard.instance.ShowKeyboard(nameInputField, true);
+            keyboardToAttach = GlobalNonNativeKeyboard.instance.keyboard;
+        }
+
+        AttachKeyboardSubmitListener(keyboardToAttach);
+    }
+
+    private void HideNameKeyboard() {
+        DetachKeyboardSubmitListener();
+
+        if (worldSpaceKeyboard != null && worldSpaceKeyboard.isOpen) {
+            worldSpaceKeyboard.Close();
+        }
+
+        if (GlobalNonNativeKeyboard.instance != null) {
+            GlobalNonNativeKeyboard.instance.HideKeyboard();
+        }
+    }
+
+    private void AttachKeyboardSubmitListener(XRKeyboard keyboard) {
+        if (!autoSubmitOnKeyboardEnter || keyboard == null) {
+            return;
+        }
+
+        if (activeNameKeyboard == keyboard) {
+            return;
+        }
+
+        DetachKeyboardSubmitListener();
+        activeNameKeyboard = keyboard;
+        activeNameKeyboard.onTextSubmitted.AddListener(OnKeyboardTextSubmitted);
+    }
+
+    private void DetachKeyboardSubmitListener() {
+        if (activeNameKeyboard == null) {
+            return;
+        }
+
+        activeNameKeyboard.onTextSubmitted.RemoveListener(OnKeyboardTextSubmitted);
+        activeNameKeyboard = null;
+    }
+
+    private void OnKeyboardTextSubmitted(KeyboardTextEventArgs args) {
+        if (!autoSubmitOnKeyboardEnter || !waitingForNameInput) {
+            return;
+        }
+
+        SubmitTypedName();
+    }
+
     private void OnExpectedSignMatched(string matchedSign) {
         if (!startedDialogue || !waitingForExpectedSign || processingSignSuccess) {
             return;
@@ -216,16 +460,24 @@ public class NPCDialogue : MonoBehaviour
 
         waitingForExpectedSign = false;
         processingSignSuccess = true;
-        lessonSignIndex++;
+        bool continueNameSigning = false;
+        if (inNameSigningMode) {
+            nameSignIndex++;
+            continueNameSigning = nameSignIndex < nameSigns.Count;
+        } else {
+            lessonSignIndex++;
+        }
 
         if (signSuccessCoroutine != null) {
             StopCoroutine(signSuccessCoroutine);
         }
-        signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign));
-        audioManager.PlaySFXOnce(audioManager.confetti);
+        signSuccessCoroutine = StartCoroutine(ShowSignSuccessAndContinue(matchedSign, continueNameSigning));
+        if (audioManager != null && audioManager.confetti != null) {
+            audioManager.PlaySFXOnce(audioManager.confetti);
+        }
     }
 
-    private IEnumerator ShowSignSuccessAndContinue(string expectedSign) {
+    private IEnumerator ShowSignSuccessAndContinue(string expectedSign, bool continueNameSigning) {
         npcPanel.SetActive(true);
         dialogueText.text = string.Format(ActiveSuccessFormat, expectedSign);
         onSignSuccess?.Invoke();
@@ -233,7 +485,12 @@ public class NPCDialogue : MonoBehaviour
         yield return new WaitForSeconds(Mathf.Max(0f, successMessageDuration));
         processingSignSuccess = false;
         signSuccessCoroutine = null;
-        NextLine();
+        if (continueNameSigning) {
+            BeginNameSigningStep();
+        } else {
+            inNameSigningMode = false;
+            NextLine();
+        }
     }
 
     // Typing animation
@@ -247,7 +504,7 @@ public class NPCDialogue : MonoBehaviour
             dialogueText.text += letter;
             yield return new WaitForSeconds(0.03f);
         }
-        audioManager.StopTypingSound();
+        audioManager?.StopTypingSound();
     }
 
     // Continue to next dialogue line
@@ -263,6 +520,10 @@ public class NPCDialogue : MonoBehaviour
             if (activeDialogue[index] == "DEMONSTRATION") {
                 Debug.Log("Demonstration");
                 // TODO: show animation for signing
+            } else if (activeDialogue[index] == nameInputMarker) {
+                BeginNameInputStep();
+            } else if (activeDialogue[index] == nameSigningMarker) {
+                BeginNameSigningStep();
             } else if (activeDialogue[index] == "SIGNING") {
                 BeginSignStep();
                 Debug.Log("Signing");
@@ -273,11 +534,13 @@ public class NPCDialogue : MonoBehaviour
                 }
                 npcPanel.SetActive(true);
                 typingCoroutine = StartCoroutine(Typing());
-                audioManager.StartTypingSound();
+                audioManager?.StartTypingSound();
                 // If last line of dialogue
                 if (index == activeDialogue.Length - 1 && !playerHasItem) {
                     inventoryItem.SetActive(true);
-                    audioManager.PlaySFXOnce(audioManager.reward);
+                    if (audioManager != null && audioManager.reward != null) {
+                        audioManager.PlaySFXOnce(audioManager.reward);
+                    }
                     // Won't give player item in future interactions
                     playerHasItem = true;
                 }
