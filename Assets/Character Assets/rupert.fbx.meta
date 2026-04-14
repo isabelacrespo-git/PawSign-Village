@@ -3,7 +3,27 @@ guid: 6599e9508648c3248a1a66397fab818b
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: c3720d5a118562f4385f281d3e0c2d8d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.012
+    second: {fileID: 2100000, guid: ee03cbc2ef8dfb54793c9e009b3b0a7a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.013
+    second: {fileID: 2100000, guid: dc63c419ec8657541a9ec37925055651, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: UvGrid.001
+    second: {fileID: 2100000, guid: cec998bfddd30994f8bdf9acb26b5b41, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
