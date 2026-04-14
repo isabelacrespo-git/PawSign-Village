@@ -15,7 +15,7 @@ public class NPCDialogue : MonoBehaviour
     private bool startedDialogue = false;
 
     public AnchorGate requiredAnchor;
-    public AudioManager audioManager;
+    public AudioManagerMain audioManager;
     public InputActionReference leftTrigger;
     public InputActionReference rightTrigger;
     public UnityEngine.XR.Interaction.Toolkit.Interactors.XRRayInteractor leftRay;
@@ -105,12 +105,12 @@ public class NPCDialogue : MonoBehaviour
     {
         if (audioManager == null)
         {
-            audioManager = FindFirstObjectByType<AudioManager>();
+            audioManager = FindFirstObjectByType<AudioManagerMain>();
         }
 
         if (audioManager == null)
         {
-            audioManager = AudioManager.GetOrCreate();
+            audioManager = AudioManagerMain.GetOrCreate();
         }
 
         if (signMatcher == null)

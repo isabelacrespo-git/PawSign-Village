@@ -7,6 +7,7 @@ public class Inventory : MonoBehaviour
     private float distance = 15f;
     public InputActionReference primaryButton;
     public GameObject inventoryUI;
+    public GameObject pauseMenuUI;
 
     // Subscribe to when primary button is pressed
     private void OnEnable()
@@ -27,7 +28,7 @@ public class Inventory : MonoBehaviour
     {
         if (inventoryUI.activeInHierarchy) {
             inventoryUI.SetActive(false);
-        } else {
+        } else if (!pauseMenuUI.activeInHierarchy) {
             inventoryUI.SetActive(true);
         }
     }

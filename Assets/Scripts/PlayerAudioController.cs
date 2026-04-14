@@ -2,17 +2,17 @@ using UnityEngine;
 
 public class PlayerAudioController : MonoBehaviour
 {
-    public AudioManager audioManager;
+    public AudioManagerMain audioManager;
     private Vector3 lastPosition;
     private bool wasMoving = false;
 
     void Start() {
         if (audioManager == null) {
-            audioManager = FindFirstObjectByType<AudioManager>();
+            audioManager = FindFirstObjectByType<AudioManagerMain>();
         }
 
         if (audioManager == null) {
-            audioManager = AudioManager.GetOrCreate();
+            audioManager = AudioManagerMain.GetOrCreate();
         }
 
         lastPosition = transform.position;
