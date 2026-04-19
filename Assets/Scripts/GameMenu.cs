@@ -20,6 +20,7 @@ public class GameMenu : MonoBehaviour
     public Button backButton2;
 
     // Start is called before the first frame update
+    private SaveSystem saveSystem = new SaveSystem();
     void Start()
     {
         EnableMainMenu();
@@ -32,6 +33,8 @@ public class GameMenu : MonoBehaviour
         if (startMenuButton) {
             startMenuButton.gameObject.SetActive(true);
             startMenuButton.onClick.AddListener(StartMenu);
+            //saves player position when clicked
+            startMenuButton.onClick.AddListener(() => saveSystem.Save());
         }
         optionButton.onClick.AddListener(EnableOption);
         controlsButton.onClick.AddListener(EnableControl);
@@ -42,6 +45,8 @@ public class GameMenu : MonoBehaviour
 
     public void QuitGame()
     {
+        //saves player position before game closes
+        saveSystem.Save();
         Application.Quit();
         // This line tells the Unity Editor to stop playing
         #if UNITY_EDITOR
